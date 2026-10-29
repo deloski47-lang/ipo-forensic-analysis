@@ -46,8 +46,8 @@ class ResearchCase(Base):
 class EvidenceItem(Base):
     __tablename__ = "evidence_items"
     __table_args__ = (
-        CheckConstraint("evidence_kind IN ('web_page', 'manual_note', 'manual_value', 'uploaded_document')", name="ck_evidence_items_kind"),
-        CheckConstraint("verification_status IN ('unverified', 'user_verified', 'conflicting', 'rejected')", name="ck_evidence_items_verification"),
+        CheckConstraint("evidence_kind IN ('web_page', 'manual_note', 'manual_value', 'document')", name="ck_evidence_items_kind"),
+        CheckConstraint("verification_status IN ('unverified', 'reviewed', 'conflicting', 'rejected')", name="ck_evidence_items_verification"),
     )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
