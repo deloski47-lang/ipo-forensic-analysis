@@ -4,7 +4,7 @@ document_id: DSA-IPO-001
 version: 1.0
 status: Research baseline; provider decisions not yet approved
 last_updated: 29 October 2026
-product_scope: Indian IPOs; local-first, single-user, manual-first MVP
+product_scope: Indian Mainboard IPOs only; local-first, single-user, manual-first, ₹0 budget MVP
 canonical_source: Markdown
 ---
 
@@ -57,9 +57,12 @@ This audit follows the approved PRD and focuses on source feasibility for the MV
 
 It does **not** assume that every module in the Indicator Catalogue must be implemented in the first release. In particular, automated news feeds, search-attention signals, a broad peer-IPO database, full market-data automation and predictive modelling are not MVP prerequisites.
 
-### Important scope question: Mainboard versus SME
+### Binding MVP scope: Mainboard only and ₹0 budget
 
-The current PRD says “Indian IPOs” but does not lock whether SME IPOs are included in the first release. SME issues can differ in exchange segment, identifiers, issue structure, market lots, liquidity and available secondary coverage. **Recommendation:** decide the launch coverage explicitly before building import rules. A Mainboard-first release is the lower-complexity default; add SME coverage only after representative SME cases pass the same source and outcome-data tests. This is a recommendation for approval, not a silent change to the approved PRD.
+The product owner's explicit decision and the repository's binding rules limit this MVP to **Indian Mainboard IPOs only**. SME IPOs are out of scope and must not be added to case-identity rules, source adapters, sample fixtures or acceptance tests. This resolves the earlier broad wording in the PRD and planning brief; it is no longer an open scope question.
+
+The total project budget is **₹0**. Do not introduce paid market-data subscriptions, datasets, AI APIs, hosting, databases, software upgrades or paid fallbacks. A free provider may be considered only as an optional convenience after its current access terms, limits and permitted use are verified; the core workflow must remain functional without it.
+
 
 ### What counts as verified
 
