@@ -4,6 +4,7 @@ import { apiGet, apiPost } from "../api/client";
 import { listEvidence, createEvidence, uploadEvidencePdf, reviewEvidence, type EvidenceItem } from "../api/evidence";
 import { getAnalysisReadiness, type AnalysisReadiness } from "../api/readiness";
 import type { CaseDetail } from "../api/cases";
+import ObservationsPanel from "./ObservationsPanel";
 
 export default function CaseDetailPage() {
   const { caseId = "" } = useParams();
@@ -164,5 +165,6 @@ export default function CaseDetailPage() {
           <div className="case-row-status"><span className="case-status">{item.verificationStatus.replaceAll("_", " ")}</span>{item.verificationStatus === "unverified" && <button className="button button-secondary" type="button" onClick={() => void markEvidenceReviewed(item)} disabled={busy}>Mark reviewed</button>}{item.downloadUrl && <a className="button button-secondary" href={"http://127.0.0.1:8000" + item.downloadUrl}>Download PDF</a>}</div>
         </article>)}</div>}
     </section>
+    <ObservationsPanel caseId={caseId} evidence={evidence} />
   </main>;
 }
