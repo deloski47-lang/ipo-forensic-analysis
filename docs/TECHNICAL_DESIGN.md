@@ -1,8 +1,8 @@
 ---
 title: IPO Forensic Analysis Engine — Technical Design
 document_id: TD-IPO-001
-version: 0.1
-status: Proposed technical baseline; validate marked decisions before implementation
+version: 0.2
+status: Validated proposed technical baseline; implementation remains gated on marked decisions
 last_updated: 29 October 2026
 canonical_source: Markdown in GitHub
 scope: Indian Mainboard IPOs; local-first; single-user; manual-first; zero-budget
@@ -43,6 +43,8 @@ Use the following order:
 6. Project Brief for the broader product vision.
 
 If two sources conflict, identify the conflict and its consequences, then propose a resolution. Never choose whichever version is easiest to implement and silently call it approved.
+
+**Known scope inconsistency found during validation:** the current PRD v1.0 uses the broader phrase “Indian IPOs,” and the Data Source & Feasibility Audit v1.0 still presents Mainboard-versus-SME coverage as an open question. The binding repository rule in `AGENTS.md` and the product owner's explicit decision are stricter: **Mainboard IPOs only; SME IPOs are out of scope**. Follow that stricter constraint in implementation. Before feature implementation, reconcile the affected wording in the existing PRD and audit files in place; do not create duplicate versions.
 
 ### 1.3 Decision-status labels
 
@@ -241,7 +243,7 @@ Recommended structure:
 - Shared design tokens and accessible styles; a paid UI kit is prohibited.
 - Local React state and simple request-state handling by default; do not add Redux or another global store until a demonstrated workflow needs it.
 
-Show loading, empty, failure, stale, conflict and not-applicable states explicitly. Do not infer a status merely because a value is blank.
+Show loading, empty, failure, stale, conflict and not-applicable states explicitly. Do not infer a status merely because a value is blank. Vite transpiles TypeScript but does not perform whole-project type checking; the validation/build workflow must run `tsc --noEmit` separately (along with linting and the Vite build). Check the Node.js runtime requirement of the selected Vite release during setup and record the chosen supported runtime in repository instructions.
 
 ### 6.2 Backend: Python and FastAPI
 
@@ -269,6 +271,8 @@ Requirements:
 5. TypeScript checks do not validate runtime JSON; server-side validation is still required.
 6. A contract change updates the backend schema, OpenAPI representation, generated frontend types, tests and documentation together.
 7. A contract test must fail if the implementation no longer matches the agreed schema.
+8. Define explicit response models (or equivalent declared response types) for API routes. Use FastAPI response-model validation/serialization so accidental extra fields or missing required fields are caught at the boundary; request models and response models should be separated where their exposure needs differ.
+9. The recommended first TypeScript type generator is `openapi-typescript`, configured as a reproducible local development dependency/script. Do not download a schema from a public or production endpoint during normal builds; generate from the local app's OpenAPI schema or a checked-in schema artifact according to the chosen workflow.
 
 The detailed field-by-field Data Contract is **not finalized in this document version**. Define it after module responsibilities and the end-to-end flow are reviewed, but before implementing multiple endpoint payloads. Do not invent endpoint schemas by guesswork.
 
@@ -280,7 +284,8 @@ Recommended baseline:
 - Database under the application's per-user data directory, never as a committed project file.
 - SQLAlchemy and Alembic as the recommended ORM/migration pair; validate the initial setup and keep migrations explicit.
 - Use transactions for operations writing related records.
-- Enable foreign-key enforcement and add sensible constraints.
+- Enable foreign-key enforcement explicitly on every SQLite connection (for example, configure `PRAGMA foreign_keys=ON` through the selected SQLAlchemy connection setup) and test that enforcement is active; declaring foreign-key constraints alone is not sufficient in SQLite.
+- Keep write transactions short. Do not hold a database write transaction open while parsing PDFs, performing OCR/AI work, waiting on a network, or rendering reports. SQLite allows only one writer at a time, which is acceptable for this single-user app when writes are short and controlled.
 - Use stable internal identifiers, not display names as primary keys.
 - Keep database timestamps consistent and date-only fields separate.
 - Store file references and checksums in the database; preserve original bytes on disk.
@@ -806,6 +811,7 @@ This is a logical layout, not a literal hard-coded path. Use a safe per-user app
 ### 13.3 Transactions and partial failures
 
 - Use clear transaction boundaries for related DB writes.
+- Test migrations against both a fresh database and a database at the prior schema revision. Do not rely only on `create_all()` to evolve an existing user's database; schema changes must be represented by migrations.
 - Do not mark a fact/run/file complete until its required persistence succeeds.
 - Partial failure must be visible and recoverable.
 - A report-render failure must not destroy a completed analysis run.
@@ -1056,7 +1062,8 @@ Local-first does not mean input is trusted or a local service should be exposed 
 
 - Bind frontend/backend development servers to loopback by default.
 - Do not expose the backend on a LAN or public internet.
-- Restrict CORS to the configured local frontend origin.
+- Restrict CORS to the configured local frontend origin. CORS is not authentication and must not be the only local-service defence.
+- Validate Host/Origin for browser-originated state-changing requests against the expected local UI/backend origins, and do not allow arbitrary origins. If the UI/API origin arrangement changes, reassess the cross-origin and CSRF implications rather than weakening the allowlist to `*`.
 - Do not add authentication in the single-user MVP unless the deployment model changes.
 - Any non-loopback/public deployment requires a separate security design and must not be treated as a trivial configuration change.
 
@@ -1085,6 +1092,7 @@ Uploaded documents and web text are evidence, not instructions for the app or AI
 - Never send documents to an AI provider as a hidden side effect.
 - No analytics or telemetry is needed.
 - Do not log secrets, unnecessary file paths or full private document contents.
+- Local files are not automatically encrypted by this architecture. Protect the application data directory with the operating system's user-account/file permissions; document that disk-level encryption is an OS/device responsibility rather than claiming the application provides encryption at rest.
 - Define a local deletion and backup policy before implementing destructive deletion.
 
 ---
@@ -1182,7 +1190,7 @@ Cover:
 - Database/filesystem failure handling.
 - Operation without internet or optional credentials.
 
-Use temporary directories and temporary test databases. Tests must not touch real user research data.
+Use temporary directories and temporary test databases. Tests must not touch real user research data. Include a test that SQLite foreign-key enforcement is enabled, and test schema migration from a previous revision as well as initial database creation.
 
 ### 20.3 API contract tests
 
@@ -1200,7 +1208,7 @@ After the Data Contract is approved, add representative JSON fixtures for each m
 
 ### 20.4 Frontend tests
 
-Cover loading, empty, success, failure, validation errors, stale/conflicting/not-applicable states, review actions, exact API field use, identity/prerequisite blocking, scenario labels, citation navigation and accessible controls. Status must not rely on colour alone.
+Cover loading, empty, success, failure, validation errors, stale/conflicting/not-applicable states, review actions, exact API field use, identity/prerequisite blocking, scenario labels, citation navigation and accessible controls. Status must not rely on colour alone. Run `tsc --noEmit` explicitly because Vite's transform/build process alone does not guarantee TypeScript type correctness.
 
 ### 20.5 End-to-end acceptance case
 
@@ -1453,13 +1461,19 @@ Any coding agent must:
 
 ## 28. Technical references
 
-Official references informing the recommended technologies. Check compatibility and supported versions at implementation time:
+Official documentation checked on 29 October 2026 while validating this proposed design. Recheck compatibility, supported versions, security advisories and license terms when the actual dependency set is pinned:
 
-- FastAPI features, OpenAPI and JSON Schema support: https://fastapi.tiangolo.com/features/
-- OpenAPI Specification: https://spec.openapis.org/oas/latest.html
+- Vite getting started and React TypeScript template: https://vite.dev/guide/ and https://react.dev/learn/typescript
+- Vite's TypeScript behaviour and the need for a separate type-check step: https://vite.dev/guide/features#typescript
+- FastAPI first steps and generated OpenAPI schema: https://fastapi.tiangolo.com/tutorial/first-steps/
+- FastAPI response models, response validation and filtering: https://fastapi.tiangolo.com/tutorial/response-model/
 - Pydantic model validation: https://docs.pydantic.dev/latest/concepts/models/
-- SQLite appropriate-use guidance: https://www.sqlite.org/whentouse.html
-- Next.js App Router documentation (considered but not the baseline because server rendering is unnecessary for the local SPA): https://nextjs.org/docs/app
+- OpenAPI Specification: https://spec.openapis.org/oas/latest.html
+- openapi-typescript documentation: https://openapi-ts.dev/introduction
+- SQLAlchemy SQLite dialect notes, including transaction and foreign-key configuration: https://docs.sqlalchemy.org/en/20/dialects/sqlite.html
+- Alembic migrations tutorial: https://alembic.sqlalchemy.org/en/latest/tutorial.html
+- SQLite appropriate-use guidance and single-writer limitations: https://www.sqlite.org/whentouse.html
+- OWASP File Upload Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html
 
 Project-specific evidence-source research stays in the Data Source & Feasibility Audit and Project Brief. This design is not a legal, licensing or market-data certification.
 
@@ -1472,3 +1486,20 @@ Project-specific evidence-source research stays in the Data Source & Feasibility
 **Engineering order:** validate the local scaffold → agree module responsibilities → confirm the end-to-end IPO-case-to-report data flow → finalize the Data Contract in this same document → approve the initial formula register → implement the first vertical slice.
 
 **Do not implement a large list of endpoints or indicators before the Data Contract and formula register are agreed.** The next step is to review the proposed architecture and resolve its marked decisions, not to generate more versions or redo the existing four documents.
+
+---
+
+## 30. Validation record
+
+**Review performed:** 29 October 2026. The current Technical Design was checked against the four detailed repository documents and the binding repository rules, and the proposed technology statements were compared with official framework/database/security documentation. The following conclusions are warranted:
+
+- The modular-monolith/local-first shape is coherent with the single-user, manual-first and zero-budget MVP, and SQLite is a reasonable fit while writes remain local and low-concurrency.
+- FastAPI can publish an OpenAPI schema and validate declared response models; frontend type generation still requires an explicit generator/check step.
+- Vite does not type-check TypeScript by itself; a separate TypeScript check is required.
+- SQLite foreign-key declarations are not enforced unless the connection is configured accordingly; this is now an explicit setup and test requirement.
+- Local upload validation must check actual file content and size, not trust filename/Content-Type alone.
+- No exact endpoint payloads, formula register, supported PDF matrix, database schema or adapter has been claimed as implemented or tested.
+
+**Known document inconsistency:** current PRD/audit v1.0 wording leaves Mainboard-versus-SME scope ambiguous, while `AGENTS.md` and the product owner's binding decision restrict scope to Mainboard IPOs. Implementation must obey the binding restriction. The conflicting scope wording should be corrected in place in the affected source documents before feature implementation; do not create parallel versions.
+
+**Validation limitations:** this was a specification/repository review, not an application test run. The repository currently has no application implementation to execute, so no runtime, migration, contract or end-to-end test is claimed to have passed. Architecture recommendations remain proposals until the initial scaffold and tests verify them.
