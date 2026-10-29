@@ -43,14 +43,14 @@ def get_analysis_readiness(
     if case.identity_status != "confirmed" or not case.issue_id:
         blockers.append(ReadinessIssue(
             code="IPO_IDENTITY_UNCONFIRMED",
-            severity="blocker",
+            severity="blocking",
             message="The exact Mainboard IPO identity has not been confirmed.",
             next_action="Add source evidence and confirm the exact Mainboard issue.",
         ))
     if not evidence:
         blockers.append(ReadinessIssue(
             code="NO_EVIDENCE_REGISTERED",
-            severity="blocker",
+            severity="blocking",
             message="No evidence is registered for this case.",
             next_action="Add official offer documents or source-backed manual evidence.",
         ))
@@ -64,13 +64,13 @@ def get_analysis_readiness(
     if not any(item.verification_status == "reviewed" for item in evidence):
         blockers.append(ReadinessIssue(
             code="NO_USER_VERIFIED_EVIDENCE",
-            severity="blocker",
+            severity="blocking",
             message="Evidence exists, but none has been explicitly marked as reviewed.",
             next_action="Review evidence before using it as an accepted analytical input.",
         ))
     blockers.append(ReadinessIssue(
         code="FORMULA_REGISTRY_NOT_ENABLED",
-        severity="blocker",
+        severity="blocking",
         message="The approved P0 formula register is not yet enabled; no financial metrics will be calculated.",
         next_action="Complete and test the formula registry before running financial analysis.",
     ))
