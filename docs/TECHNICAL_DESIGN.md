@@ -69,7 +69,7 @@ Build a **local-first modular monolith**: a small web frontend, a local Python A
 | Concern | Recommendation | Rationale |
 |---|---|---|
 | Application shape | Single-user local web application | Fits personal research use and keeps data under the user's control. |
-| Frontend | React + TypeScript + Vite SPA | The local app does not need server-side rendering or SEO; a simple SPA makes the API boundary clear. This is a recommendation, not a product requirement. |
+| Frontend | React + TypeScript + Vite SPA | Frozen P0 choice in the Implementation Blueprint; no server-side rendering or SEO is required for this local single-user app. |
 | Backend/API | Python + FastAPI | Fits the Python analytical and document-processing layer and provides typed request/response models and an OpenAPI description. |
 | Contract and validation | Pydantic models + OpenAPI + generated or automatically checked TypeScript API types | Avoids independently hand-maintained contracts that drift between frontend and backend. |
 | Persistence | SQLite for structured records | Local embedded storage requires no database server and is suitable for the single-user MVP. |
@@ -1264,9 +1264,9 @@ Exit gate: a restored test bundle can reopen its case, evidence and saved report
 | Decision | Status/recommendation | Rationale or next action |
 |---|---|---|
 | Overall architecture | **Recommended:** local modular monolith | Smallest design that separates UI, API, analysis and persistence. |
-| Frontend | **Recommended:** React + TypeScript + Vite | Fits local SPA; validate scaffold. |
-| Backend | **Recommended:** Python + FastAPI | Fits document/financial analysis. |
-| API schema | **Recommended:** Pydantic + OpenAPI + generated/checked TypeScript types | Prevents hand-maintained contract drift. |
+| Frontend | **Fixed for P0:** React + TypeScript + Vite | Frozen in docs/implementation-blueprint.md; validate the scaffold. |
+| Backend | **Fixed for P0:** Python + FastAPI | Frozen in docs/implementation-blueprint.md; validate the scaffold. |
+| API schema | **Fixed for P0:** Pydantic + OpenAPI + generated/checked TypeScript types | Keeps frontend/backend payloads aligned. |
 | Exact API field names/payloads | **Frozen in Implementation Blueprint** | Implement from docs/implementation-blueprint.md and validate with generated types/contract tests. |
 | Wire property casing | **Frozen: camelCase JSON** | Python/database snake_case; OpenAPI-generated TypeScript types; no field casing by screen. |
 | Persistence | **Recommended:** SQLite | Single-user local app without server. |
