@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import type { FormEvent } from "react";
 import { getHealth, type HealthResponse } from "../api/client";
 import { createCase, listCases, type CaseSummary } from "../api/cases";
+import DataProtectionPanel from "./DataProtectionPanel";
 
 type ServiceState =
   | { kind: "loading" }
@@ -134,6 +135,8 @@ export default function CasesPage() {
               </article>)}</div>}
         </section>
       </section>
+
+      <DataProtectionPanel />
 
       <section className="guardrail-strip" aria-label="Product guardrails">
         <div><span className="guardrail-icon">01</span><p><strong>Mainboard only</strong><small>SME issues are out of scope</small></p></div>
