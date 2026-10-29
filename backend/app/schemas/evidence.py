@@ -4,8 +4,8 @@ from pydantic import Field, HttpUrl, field_validator
 
 from app.schemas.health import ApiSchema
 
-EvidenceKind = Literal["web_page", "manual_note", "manual_value", "uploaded_document"]
-EvidenceVerificationStatus = Literal["unverified", "user_verified", "conflicting", "rejected"]
+EvidenceKind = Literal["web_page", "manual_note", "manual_value", "document"]
+EvidenceVerificationStatus = Literal["unverified", "reviewed", "conflicting", "rejected"]
 
 
 class CreateEvidenceRequest(ApiSchema):
