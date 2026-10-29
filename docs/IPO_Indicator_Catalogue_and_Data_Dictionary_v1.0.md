@@ -14,6 +14,8 @@ converted_on: 2026-10-29
 
 **Critical rule:** AI must not invent missing values, fabricate citations, silently fill data gaps, or perform financial arithmetic without independent validation. Calculations belong in deterministic, tested code.
 
+**Binding project scope:** This catalogue is for Indian Mainboard IPOs only; SME IPOs are outside MVP scope. Total project budget is ₹0. Implementation must remain local-first and manual-first, with no required paid API, dataset, AI service, hosting or paid fallback. The catalogue defines a research framework; it does not mean every indicator must be implemented in MVP or that every source is available.
+
 ---
 
 IPO INDICATOR  
