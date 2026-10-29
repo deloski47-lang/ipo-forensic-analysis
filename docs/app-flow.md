@@ -1127,18 +1127,6 @@ The following are required end-to-end scenarios. They are designed to catch inte
 
 **Pass when:** the local/manual fallback path completes with no external API, paid service or AI requirement; the UI does not pretend live source retrieval succeeded when offline.
 
-### AT-15 — IPO-name-triggered source acquisition and signal interconnection
-
-1. Use a representative Mainboard IPO with an unambiguous identity and run the acquisition workflow online.
-2. Confirm the system attempts every enabled/approved connector configured for that source benchmark and persists the attempt/result status.
-3. Inspect QIB, NII, retail subscription and named unofficial GMP results where the tested connectors return them; verify source, category/definition, value/unit, observation/publication/retrieval times and freshness.
-4. Force one connector to fail or return partial data; verify the result is marked failed/partial/unavailable rather than zero or successful.
-5. Run the enabled cross-signal checks linking available subscription/GMP inputs with valuation, fundamentals, issue/free-float context and market/company-event signals.
-6. Remove or stale one input; rerun preflight and verify the affected relationship is qualified/skipped with a specific reason while unrelated valid checks can run.
-7. Manually enter or import the missing observation and verify it keeps its provenance/status and is included only under the agreed validation policy.
-
-**Pass when:** acquisition outcomes are observable and reproducible; supported signal relationships are actually evaluated from time-aligned validated inputs; no missing, stale, unofficial or failed-source value is presented as verified or predicted. The test report records actual source coverage and never claims universal automation from one successful sample.
-
 ### AT-02 — Ambiguous identity
 
 1. Create a case with a name that is not sufficient to identify one issue.
@@ -1261,6 +1249,20 @@ After the Data Contract is approved:
 **Pass when:** a clear not-found/integrity state is shown and the app never opens a different case by name similarity.
 
 ---
+
+### AT-15 — IPO-name-triggered source acquisition and signal interconnection
+
+1. Use a representative Mainboard IPO with an unambiguous identity and run the acquisition workflow online.
+2. Confirm the system attempts every enabled/approved connector configured for that source benchmark and persists the attempt/result status.
+3. Inspect QIB, NII, retail subscription and named unofficial GMP results where the tested connectors return them; verify source, category/definition, value/unit, observation/publication/retrieval times and freshness.
+4. Force one connector to fail or return partial data; verify the result is marked failed/partial/unavailable rather than zero or successful.
+5. Run the enabled cross-signal checks linking available subscription/GMP inputs with valuation, fundamentals, issue/free-float context and market/company-event signals.
+6. Remove or stale one input; rerun preflight and verify the affected relationship is qualified/skipped with a specific reason while unrelated valid checks can run.
+7. Manually enter or import the missing observation and verify it keeps its provenance/status and is included only under the agreed validation policy.
+
+**Pass when:** acquisition outcomes are observable and reproducible; supported signal relationships are actually evaluated from time-aligned validated inputs; no missing, stale, unofficial or failed-source value is presented as verified or predicted. The test report records actual source coverage and never claims universal automation from one successful sample.
+
+
 
 ## 13. Dependencies and decisions that must be settled before coding each flow
 
