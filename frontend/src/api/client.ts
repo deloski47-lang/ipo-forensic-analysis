@@ -29,9 +29,9 @@ export async function apiGet<T>(path: string, timeoutMs = 5_000): Promise<T> {
   } catch (error) {
     if (error instanceof ApiClientError) throw error;
     if (error instanceof DOMException && error.name === "AbortError") {
-      throw new Error("The local API did not respond in time.");
+      throw new Error("The local API did not respond in time.", { cause: error });
     }
-    throw new Error("Could not reach the local API. Check that the Python backend is running.");
+    throw new Error("Could not reach the local API. Check that the Python backend is running.", { cause: error });
   } finally {
     globalThis.clearTimeout(timeoutId);
   }
