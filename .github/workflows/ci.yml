@@ -1,4 +1,4 @@
-name: Phase 0 checks
+name: IPO app checks
 
 on:
   push:
@@ -8,6 +8,10 @@ on:
   pull_request:
     branches:
       - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
