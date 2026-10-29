@@ -17,9 +17,12 @@ async function request<T>(path: string, init: RequestInit = {}, timeoutMs = 8_00
   const controller = new AbortController();
   const timeoutId = globalThis.setTimeout(() => controller.abort(), timeoutMs);
   try {
+    const headers = new Headers(init.headers);
+    headers.set("Accept", "application/json");
+    if (init.body) headers.set("Content-Type", "application/json");
     const response = await fetch(API_BASE_URL + path, {
       ...init,
-      headers: { Accept: "application/json", ...(init.body ? { "Content-Type": "application/json" } : {}), ...init.headers },
+      headers,
       signal: controller.signal
     });
     if (!response.ok) throw await readApiError(response);
