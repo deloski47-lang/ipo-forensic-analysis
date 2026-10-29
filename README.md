@@ -32,3 +32,37 @@ The repository Markdown files are the source of truth. Update the existing file 
 ## Current status
 
 The project requirements, evidence-source baseline, application flow, UI/UX design, technical architecture, proposed SQLite schema, and implementation plan are recorded in the canonical Markdown documents. The [Implementation Blueprint & Data Contract](docs/implementation-blueprint.md) now fixes the P0 frontend/backend stack, target file tree, API paths, JSON fields, nullability, enums, error envelope, configuration variables, local storage layout and build gates. These are specifications, not evidence that the application has been implemented or tested. Before feature development, validate the local scaffold, align docs/database-schema.md and migration 0001 with the blueprint, approve the initial P0 formula register and define representative fixtures. Implementation must work without paid services, a single external provider or AI. Source-acquisition orchestration and interconnection of available fundamentals, valuation, QIB/NII/retail subscription and GMP signals remain required; connectors need dated feasibility evidence before enablement.
+
+
+## Local development — Phase 0 scaffold
+
+The working scaffold is being built on branch build/phase-0-scaffold. It is not merged into main yet.
+
+### Prerequisites
+
+- Python 3.11 or newer.
+- Node.js 22.12 or newer (current Vite requires Node.js 20.19+ or 22.12+).
+- Git.
+
+### Start the backend (Windows PowerShell)
+
+    cd backend
+    py -m venv .venv
+    .\.venv\Scripts\Activate.ps1
+    python -m pip install --upgrade pip
+    pip install -e ".[dev]"
+    uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+
+The initial GET /api/v1/health endpoint should respond. It intentionally reports the database as not initialized until the schema/migration milestone is implemented.
+
+### Start the frontend (a second terminal)
+
+    cd frontend
+    npm install
+    npm run dev
+
+Open http://127.0.0.1:5173. The screen should show whether the local API is reachable. From the frontend folder, run npm run typecheck, npm run lint and npm test. From the backend folder, run pytest.
+
+### Important current limitation
+
+This scaffold is only the first build foundation. Case creation, persistent SQLite models/migrations, evidence upload, manual fact entry, acquisition orchestration, analysis runs, scenario calculations and reports are not implemented by the scaffold commit. Do not enter real research data until persistence and backup/restore have been implemented and tested.
