@@ -13,7 +13,7 @@ scope: Indian Mainboard IPOs; local-first; single-user; manual-first; zero-budge
 
 > **Purpose:** Translate the project's brief, approved product requirements, indicator catalogue, data-source feasibility audit and decisions discussed with the product owner into a practical engineering design. It defines the recommended architecture, responsibilities, end-to-end data flow, persistence, validation, report pipeline, testing and implementation order. It is written so a developer or coding agent can build the intended product without inventing a different one or silently changing requirements.
 
-**This is a proposed architecture baseline, not a claim that every technical choice has already been tested or approved.** Decisions are classified as fixed constraints, recommended baselines, decisions requiring validation, or deferred. The exact field-by-field Data Contract is intentionally not frozen yet: its purpose and readiness gate are defined here, but precise API payloads must be finalized after the module boundaries and end-to-end flow are settled.
+**This is an architecture rationale and implementation design, not a claim that code or tests have passed.** The P0 field-by-field API contract and target code file layout are now frozen in [Implementation Blueprint & Data Contract](implementation-blueprint.md). This Technical Design remains authoritative for architecture rationale, module principles and engineering constraints; follow the Blueprint for exact paths, fields, enums, nullability and file ownership.
 
 ---
 
@@ -275,7 +275,7 @@ Requirements:
 8. Define explicit response models (or equivalent declared response types) for API routes. Use FastAPI response-model validation/serialization so accidental extra fields or missing required fields are caught at the boundary; request models and response models should be separated where their exposure needs differ.
 9. The recommended first TypeScript type generator is `openapi-typescript`, configured as a reproducible local development dependency/script. Do not download a schema from a public or production endpoint during normal builds; generate from the local app's OpenAPI schema or a checked-in schema artifact according to the chosen workflow.
 
-The detailed field-by-field Data Contract is **not finalized in this document version**. Define it after module responsibilities and the end-to-end flow are reviewed, but before implementing multiple endpoint payloads. Do not invent endpoint schemas by guesswork.
+The detailed field-by-field Data Contract is defined in [Implementation Blueprint & Data Contract](implementation-blueprint.md). Use that document for exact endpoint schemas before implementing routes; do not invent a competing endpoint schema by guesswork.
 
 ### 6.4 Persistence: SQLite and local files
 
@@ -443,7 +443,7 @@ ipo-forensic-analysis/
 
 ## 8. Domain ownership and responsibilities
 
-This section defines logical responsibilities, not the final field-by-field schema. Exact names and payload properties belong to the Data Contract step.
+This section defines logical responsibilities. Exact API names and payload properties are frozen in [Implementation Blueprint & Data Contract](implementation-blueprint.md).
 
 ### 8.1 Issuer, IPO issue and research case
 
@@ -609,7 +609,7 @@ Manual entry, document registration and import remain complete fallbacks. Missin
 
 ## 10. Conceptual data model
 
-The proposed persistence fields and relationships are documented in [docs/database-schema.md](database-schema.md). Exact API representation, wire property names, request/response shapes and any schema adjustments required by the Data Contract remain to be agreed before migrations and dependent endpoints are implemented.
+The proposed persistence fields and relationships are documented in [Database Schema](database-schema.md). Exact API representation, wire names and request/response shapes are frozen in [Implementation Blueprint & Data Contract](implementation-blueprint.md). Align the database schema with that contract and test migration 0001 before implementing dependent endpoints.
 
 | Concept | Purpose | Invariants |
 |---|---|---|
@@ -697,7 +697,7 @@ If a time is unknown, leave it unknown and surface the limitation. File retrieva
 - Never compare a partial period with a full year without an explicit defensible adjustment.
 - Define behaviour for zero, negative or near-zero denominators. Return not-meaningful/blocked with an explanation when appropriate.
 - Retain internal precision and round for display according to the documented convention.
-- Before implementing the Data Contract, decide consistently whether high-precision decimal values cross the API as JSON numbers or decimal strings. Never leave serialization to accidental defaults.
+- The P0 contract now fixes high-precision decimal values crossing the API as decimal strings, with Python Decimal as the calculation authority. Preserve this in Pydantic serializers, generated TypeScript types and contract tests.
 
 ### 11.3 Identity rules
 
@@ -712,7 +712,7 @@ If a time is unknown, leave it unknown and surface the limitation. File retrieva
 
 ## 12. API and module contract strategy
 
-This section defines how the contract will be designed and enforced. **It is not the final Data Contract.** Exact JSON properties, endpoint payloads and function signatures are intentionally deferred until module ownership and the end-to-end flow are reviewed.
+This section describes the contract strategy. The exact P0 API contract is in [Implementation Blueprint & Data Contract](implementation-blueprint.md); this section remains supporting rationale and must not override that document.
 
 ### 12.1 API resource groups required
 
@@ -752,7 +752,7 @@ Recommended language convention: Python functions, variables and module names us
 
 ### 12.3 Proposed error behaviour
 
-Define one consistent, machine-readable error response in the Data Contract. It must distinguish:
+Use the standard machine-readable error envelope and codes fixed in [Implementation Blueprint & Data Contract](implementation-blueprint.md). It must distinguish:
 - Invalid request/input.
 - Resource not found.
 - Ambiguous identity.
@@ -1347,8 +1347,8 @@ Exit gate: a restored test bundle can reopen its case, evidence and saved report
 | Frontend | **Recommended:** React + TypeScript + Vite | Fits local SPA; validate scaffold. |
 | Backend | **Recommended:** Python + FastAPI | Fits document/financial analysis. |
 | API schema | **Recommended:** Pydantic + OpenAPI + generated/checked TypeScript types | Prevents hand-maintained contract drift. |
-| Exact API field names/payloads | **Deferred to Data Contract step** | Finalize after module responsibilities and end-to-end flow. |
-| Wire property casing | **Must be decided in Data Contract** | Choose once and enforce everywhere. |
+| Exact API field names/payloads | **Frozen in Implementation Blueprint** | Implement from docs/implementation-blueprint.md and validate with generated types/contract tests. |
+| Wire property casing | **Frozen: camelCase JSON** | Python/database snake_case; OpenAPI-generated TypeScript types; no field casing by screen. |
 | Persistence | **Recommended:** SQLite | Single-user local app without server. |
 | ORM/migrations | **Recommended:** SQLAlchemy + Alembic | Validate setup; use controlled migrations. |
 | Local path/OS support | **Requires validation** | Confirm safe per-user paths and recovery strategy. |
@@ -1371,23 +1371,25 @@ Exit gate: a restored test bundle can reopen its case, evidence and saved report
 
 Do not implement a large set of endpoint payloads until these items are agreed and written in this same canonical file.
 
-- [ ] Confirm module responsibilities and case-to-report data flow.
-- [ ] Agree conceptual entities/relationships and which objects need persistent IDs.
-- [ ] Define the endpoint list and methods.
-- [ ] Choose canonical wire property naming.
-- [ ] Define exact request/response schemas, required/optional/null fields and enums.
-- [ ] Define identifiers, timestamps, date-only fields and time zones.
-- [ ] Define decimal/money serialization and display rounding.
-- [ ] Define all statuses and allowed transitions.
-- [ ] Define the common error envelope and field validation errors.
-- [ ] Define upload/download behaviour and cleanup/error rules.
-- [ ] Define collection retrieval/pagination only where needed.
-- [ ] Define API versioning and contract-change policy.
-- [ ] Generate OpenAPI and TypeScript API types from the approved contract.
-- [ ] Write contract tests before frontend features depend on the endpoints.
-- [ ] Review the contract against PRD requirements, the Indicator Catalogue and Data Source Audit.
+Contract-definition work is captured in docs/implementation-blueprint.md. The remaining checklist is implementation validation, not a reason to draft another contract:
 
-The project owner explicitly identified frontend/backend interconnection and exact variable names as a major implementation risk. The answer is to formalize the interface before building UI features, not to invent every payload before architecture and flow are understood.
+- [x] Record module responsibilities and case-to-report data flow.
+- [x] Define the P0 endpoint list and HTTP methods.
+- [x] Fix camelCase JSON wire names and Python/database snake_case conventions.
+- [x] Define P0 request/response fields, nullability and enums.
+- [x] Define IDs, timestamps, date-only fields and UTC persistence semantics.
+- [x] Fix decimal-string serialization and Python Decimal calculation semantics.
+- [x] Define core statuses and transitions.
+- [x] Define shared error envelope, codes and field validation details.
+- [x] Define upload/download, parent-child ownership and file cleanup behaviour.
+- [x] Define API version prefix and contract-change policy.
+- [ ] Validate Pydantic models against this specification in code.
+- [ ] Generate OpenAPI and TypeScript types from the actual backend.
+- [ ] Add contract tests for payloads, nullability, enums and error envelopes.
+- [ ] Align database-schema.md and test the first Alembic migration against the contract.
+- [ ] Review initial formulas against PRD, Indicator Catalogue and source audit.
+
+The Blueprint is the specification source; code generation, migrations and tests stay unchecked until actually implemented and run.
 
 ---
 
@@ -1399,7 +1401,8 @@ Before the first substantive feature:
 - [ ] Confirm core operation without internet after installation.
 - [ ] Confirm local database/evidence/reports/logs/secrets are excluded from Git.
 - [ ] Confirm initial app-data path and backup approach.
-- [ ] Approve the first Data Contract vertical slice.
+- [x] Record the first-slice P0 API/Data Contract in docs/implementation-blueprint.md.
+- [ ] Implement and test the first-slice contract in Pydantic/OpenAPI and generated TypeScript types.
 - [ ] Approve the first P0 formula register and independently checked fixtures.
 - [ ] Test representative Mainboard IPO documents for preservation and extraction feasibility.
 - [ ] Define minimal report sections and export acceptance test.
@@ -1500,15 +1503,15 @@ Project-specific evidence-source research stays in the Data Source & Feasibility
 
 **Technical baseline:** React + TypeScript + Vite frontend, Python + FastAPI backend, OpenAPI-driven contract with generated/checked TypeScript types, SQLite, local evidence-file storage, deterministic Python formula/rule engine, local HTML preview and DOCX-first export.
 
-**Engineering order:** validate the local scaffold → agree module responsibilities → confirm the end-to-end IPO-case-to-report data flow → finalize the Data Contract in this same document → approve the initial formula register → implement the first vertical slice.
+**Engineering order:** validate the local scaffold → implement the frozen contract and OpenAPI type-generation path from docs/implementation-blueprint.md → align/test database migration 0001 → approve the initial formula register → implement the first vertical slice.
 
-**Do not implement a large list of endpoints or indicators before the Data Contract and formula register are agreed.** The next step is to review the proposed architecture and resolve its marked decisions, not to generate more versions or redo the existing four documents.
+**Do not implement endpoint payloads that contradict the frozen Blueprint or enable formulas before the P0 formula register is approved.** The next step is scaffold validation, contract/model generation, schema alignment and a small tested vertical slice—not creating competing specifications.
 
 ---
 
 ## 30. Validation record
 
-**Review performed:** 29 October 2026. The current Technical Design was checked against the four detailed repository documents and the binding repository rules, and the proposed technology statements were compared with official framework/database/security documentation. The following conclusions are warranted:
+**Review performed:** 29 October 2026. The Technical Design was reviewed against the canonical project documents and repository rules. The P0 endpoint/wire contract was subsequently frozen in docs/implementation-blueprint.md. The following conclusions are warranted:
 
 - The modular-monolith/local-first shape is coherent with the single-user, manual-first and zero-budget MVP, and SQLite is a reasonable fit while writes remain local and low-concurrency.
 - FastAPI can publish an OpenAPI schema and validate declared response models; frontend type generation still requires an explicit generator/check step.
@@ -1520,3 +1523,22 @@ Project-specific evidence-source research stays in the Data Source & Feasibility
 **Cross-document scope check:** completed. The existing PRD, Data Source & Feasibility Audit, Project Brief and Indicator Catalogue now state Mainboard-only coverage and the ₹0 constraint. Agent instructions and README links were also corrected in place.
 
 **Validation limitations:** this was a specification/repository review, not an application test run. The repository currently has no application implementation to execute, so no runtime, migration, contract or end-to-end test is claimed to have passed. Architecture recommendations remain proposals until the initial scaffold and tests verify them.
+
+
+---
+
+## 31. Contract authority update — 29 October 2026
+
+The earlier planning sections above were written before the contract had been frozen. They remain useful architecture rationale, but any wording that says field names, wire casing, decimal serialization or exact API payloads are still undecided is superseded by [Implementation Blueprint & Data Contract](implementation-blueprint.md).
+
+The Blueprint now fixes the P0 stack (React/TypeScript/Vite + Python/FastAPI), the intended source file tree and module ownership, /api/v1 routes, camelCase JSON fields, P0 enum strings, request/response properties, standard error envelope, environment variables, local data layout and build order. Use it as the public interface contract. This file remains the rationale/technical-design document; docs/database-schema.md remains the persisted-schema document.
+
+Still open for implementation validation—not speculative renaming:
+- compatible dependency versions and clean scaffold installation,
+- alignment of the current v0.1 schema to the Blueprint and migration v1 testing,
+- generated OpenAPI and TypeScript types,
+- representative PDF/DOCX tests,
+- the initial P0 formula/rule register and golden fixtures,
+- provider-specific terms/coverage approval and any critical free/permitted-source gap.
+
+No application code, contract test, migration or source adapter is implied to have passed merely because the specification is now fixed.
