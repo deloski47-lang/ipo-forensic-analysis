@@ -50,14 +50,14 @@ describe("research cases workspace", () => {
   it("loads saved cases from the API", async () => {
     render(<MemoryRouter initialEntries={["/cases"]}><AppRouter /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: /your ipo research, grounded in evidence/i })).toBeInTheDocument();
-    expect(await screen.findByText("Acme Industries IPO")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Acme Industries IPO" })).toBeInTheDocument();
     expect(screen.getByText(/local api and database ready/i)).toBeInTheDocument();
   });
 
   it("creates a case through the API and shows it only after the API responds", async () => {
     render(<MemoryRouter initialEntries={["/cases"]}><AppRouter /></MemoryRouter>);
     fireEvent.change(screen.getByLabelText(/ipo or issuer name/i), { target: { value: "New Mainboard IPO" } });
-    fireEvent.click(screen.getByRole("button", { name: /create research case/i }));
+    fireEvent.submit(screen.getByRole("button", { name: /create research case/i }).closest("form")!);
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
       expect.stringMatching(/\/cases$/),
       expect.objectContaining({ method: "POST", body: JSON.stringify({ enteredName: "New Mainboard IPO" }) })
