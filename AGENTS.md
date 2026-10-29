@@ -2,7 +2,7 @@
 
 ## Read before changing anything
 
-Read, in order: `README.md`, `docs/IPO_Forensic_Analysis_Project_Brief_v1.0.md`, `docs/IPO_Forensic_Analysis_PRD_v1.0_APPROVED.md`, `docs/IPO_Indicator_Catalogue_and_Data_Dictionary_v1.0.md`, `docs/IPO_Data_Source_and_Feasibility_Audit_v1.0.md`, `docs/app-flow.md`, `docs/design.md`, and `docs/TECHNICAL_DESIGN.md`. Then identify the affected requirement IDs and indicator definitions before changing implementation.
+Read, in order: `README.md`, `docs/IPO_Forensic_Analysis_Project_Brief_v1.0.md`, `docs/IPO_Forensic_Analysis_PRD_v1.0_APPROVED.md`, `docs/IPO_Indicator_Catalogue_and_Data_Dictionary_v1.0.md`, `docs/IPO_Data_Source_and_Feasibility_Audit_v1.0.md`, `docs/app-flow.md`, `docs/design.md`, and `docs/TECHNICAL_DESIGN.md`, then read `docs/implementation-blueprint.md` and `docs/implementation-plan.md`. The Implementation Blueprint is authoritative for the target file tree, fixed P0 API routes/wire fields/enums/configuration, and frontend/backend boundaries; the Implementation Plan defines delivery phases. Then identify affected requirement IDs and indicator definitions before changing implementation.
 
 The filenames above are the actual existing canonical files in this repository. Preserve their full content and update them in place; do not create more numbered, dated, or duplicate copies as part of routine changes. Use Git history for previous states. Renaming the current historical filenames is a separate, deliberate repository change and must update every reference in the same change.
 
@@ -21,7 +21,7 @@ The filenames above are the actual existing canonical files in this repository. 
 
 ## Documentation and decisions
 
-- Update the existing canonical file; do **not** create numbered, dated or duplicate versions for routine edits.
+- Update the existing canonical file; do **not** create numbered, dated or duplicate versions for routine edits. `docs/implementation-blueprint.md` is the authority for the exact P0 Data Contract and target code layout; do not invent a competing API schema or rename its fields per screen.
 - Use Git history for previous states. Do not generate routine download copies.
 - When a material product, data, architecture or methodology decision is made, record the decision, rationale/evidence, alternatives and consequences in the relevant canonical document in the same change.
 - If canonical documents conflict or a decision is missing, flag it. Follow the product owner's explicit binding decisions and do not silently choose the easiest implementation.
