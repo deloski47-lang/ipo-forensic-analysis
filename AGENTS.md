@@ -2,7 +2,7 @@
 
 ## Read before changing anything
 
-Read, in order: `README.md`, `docs/IPO_Forensic_Analysis_Project_Brief_v1.0.md`, `docs/IPO_Forensic_Analysis_PRD_v1.0_APPROVED.md`, `docs/IPO_Indicator_Catalogue_and_Data_Dictionary_v1.0.md`, `docs/IPO_Data_Source_and_Feasibility_Audit_v1.0.md`, `docs/app-flow.md`, and `docs/TECHNICAL_DESIGN.md`. Then identify the affected requirement IDs and indicator definitions before changing implementation.
+Read, in order: `README.md`, `docs/IPO_Forensic_Analysis_Project_Brief_v1.0.md`, `docs/IPO_Forensic_Analysis_PRD_v1.0_APPROVED.md`, `docs/IPO_Indicator_Catalogue_and_Data_Dictionary_v1.0.md`, `docs/IPO_Data_Source_and_Feasibility_Audit_v1.0.md`, `docs/app-flow.md`, `docs/design.md`, and `docs/TECHNICAL_DESIGN.md`. Then identify the affected requirement IDs and indicator definitions before changing implementation.
 
 The filenames above are the actual existing canonical files in this repository. Preserve their full content and update them in place; do not create more numbered, dated, or duplicate copies as part of routine changes. Use Git history for previous states. Renaming the current historical filenames is a separate, deliberate repository change and must update every reference in the same change.
 
