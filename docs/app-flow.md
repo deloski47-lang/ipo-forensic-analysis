@@ -1673,3 +1673,34 @@ A vertical slice is usable only when the user can complete the following sequenc
 
 The first implementation should exercise this complete, minimal path before expanding provider coverage or adding advanced automation.
 
+
+
+---
+
+## Addendum B — Contract and file-structure decisions are now frozen
+
+The previous sections describe the user journey and remain the source of truth for what the user sees and does. The P0 API fields/statuses and the target code file tree are now specified in [Implementation Blueprint & Data Contract](implementation-blueprint.md). This is an additive clarification to the conceptual references above, not a replacement for this flow document.
+
+### B1. Which document controls what
+
+- **app-flow.md:** screen order, user actions, prerequisites, visible states, error recovery and acceptance behaviour.
+- **design.md:** approved visual presentation, palette, typography, responsive behaviour, accessibility and motion; the exact hero remains owner-controlled.
+- **TECHNICAL_DESIGN.md:** architecture rationale, system boundaries and technical principles.
+- **implementation-blueprint.md:** exact P0 frontend/backend stack, file tree and responsibilities, API methods/routes, camelCase JSON names, exact wire enums, request/response fields, decimal/timestamp rules, errors, configuration variables, local data-directory layout and contract change process.
+- **database-schema.md:** SQLite entities/constraints/indexes and the migration alignment work needed to match the API contract.
+- **implementation-plan.md:** delivery phases, gates, and what should be built/tested first.
+
+### B2. Contract decisions relevant to the screens
+
+- Browser route parameters are caseId, analysisRunId and reportId as defined in the blueprint; display names are not identifiers.
+- API wire properties use camelCase. Do not use conceptual snake_case identifiers from earlier examples as literal JSON field names.
+- IDs are backend-generated UUID strings. A case may exist with no confirmed issue; full issue-specific analysis remains blocked until identity is confirmed with evidence.
+- Unknown numeric/time values are null with a status/reason, not zero or empty-string sentinels. Decimal values cross the API as decimal strings; money arithmetic belongs to Python Decimal.
+- Core source/analysis statuses are defined in the blueprint and must be rendered as text as well as visual styling. A missing provider, a failed attempt and a successful source check are different states.
+- File upload is to POST /api/v1/cases/{caseId}/evidence/files (PDF-only P0, 25 MiB default cap). Files are saved locally after the case exists; extraction yields candidates only and never silently accepts facts.
+- Analysis readiness is read from GET /api/v1/cases/{caseId}/analysis/readiness. The effective informationCutoffAt returned by preflight is supplied to POST /api/v1/cases/{caseId}/analysis-runs.
+- Reports are created from an immutable saved analysis run. POST report creation/export does not silently run analysis again.
+
+### B3. Flow-to-contract integration gate
+
+Before considering any screen implemented, verify that its action maps to the API route/response model in the blueprint, that its empty/loading/partial/error states are represented, that backend validation enforces the same constraints, and that the database schema/migration stores the required provenance. Update the blueprint, implementation models, generated TypeScript types and tests together if a product-approved behaviour change requires a contract change. Do not create a separate competing Data Contract file.
