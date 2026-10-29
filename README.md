@@ -23,11 +23,12 @@ Read the canonical documents in this order:
 6. [UI/UX Design Specification](docs/design.md)
 7. [Technical Design](docs/TECHNICAL_DESIGN.md)
 8. [Database Schema — proposed v0.1](docs/database-schema.md)
-9. [Implementation Plan](implementation-plan.md)
-10. [Agent rules](AGENTS.md)
+9. [Implementation Blueprint & Data Contract](docs/implementation-blueprint.md)
+10. [Implementation Plan](docs/implementation-plan.md)
+11. [Agent rules](AGENTS.md)
 
 The repository Markdown files are the source of truth. Update the existing file when a decision changes; use Git history rather than creating numbered copies or routine download files. Existing historical filenames are preserved for now, and every link must use their actual paths.
 
 ## Current status
 
-The detailed product requirements, evidence-source baseline, application flow, UI/UX design baseline, proposed technical architecture and proposed SQLite database schema are recorded. The database-schema document defines a concrete v0.1 persistence baseline, but its migrations have not been implemented or tested, and its field/API alignment must be finalized against the first Data Contract. These documents are specifications, not evidence that the application has been implemented or tested. Before substantive feature development, validate the local technical scaffold, finalize the first Data Contract for the initial vertical slice, approve the initial MVP formula register, and define representative test fixtures. Implementation must remain usable without paid services, a single external provider or AI. Source-acquisition orchestration and core interconnection of available company/offer fundamentals, valuation, QIB/NII/retail subscription and GMP signals are required product capabilities; individual connectors must be supported by dated feasibility evidence.
+The project requirements, evidence-source baseline, application flow, UI/UX design, technical architecture, proposed SQLite schema, and implementation plan are recorded in the canonical Markdown documents. The [Implementation Blueprint & Data Contract](docs/implementation-blueprint.md) now fixes the P0 frontend/backend stack, target file tree, API paths, JSON fields, nullability, enums, error envelope, configuration variables, local storage layout and build gates. These are specifications, not evidence that the application has been implemented or tested. Before feature development, validate the local scaffold, align docs/database-schema.md and migration 0001 with the blueprint, approve the initial P0 formula register and define representative fixtures. Implementation must work without paid services, a single external provider or AI. Source-acquisition orchestration and interconnection of available fundamentals, valuation, QIB/NII/retail subscription and GMP signals remain required; connectors need dated feasibility evidence before enablement.
