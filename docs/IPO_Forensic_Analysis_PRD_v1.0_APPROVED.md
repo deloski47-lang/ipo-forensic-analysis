@@ -114,7 +114,7 @@ The user needs to:
 
 The first release must deliver interconnected forensic analysis across company fundamentals, offer/valuation, category-wise subscription demand, GMP and relevant market/company signals where available. The system must attempt automated issue/source discovery and retrieval through approved connectors rather than requiring the user to manually hunt every signal. Manual entry and evidence upload remain complete fallbacks, including when offline. The source providers and access methods must pass a documented free/permitted-use and data-quality gate; do not promise data that has not been verified. A missing free/permitted route for a critical signal must be escalated as an explicit product-owner decision before release, not silently used to defer the capability.
 
-### 6.1 MVP: manual-first forensic report
+### 6.1 MVP: evidence-first forensic report with source acquisition
 
 The MVP must support:
 
