@@ -1357,7 +1357,7 @@ Exit gate: a restored test bundle can reopen its case, evidence and saved report
 | P0 formula list | **Open analytical decision** | Approve small formula register and golden test data. |
 | Cross-check set | Small tested subset first | Avoid enabling all catalogue rules at once. |
 | AI provider | None required; optional adapter only | Respects ₹0 and manual-first constraints. |
-| News/Trends/subscription/GMP providers | Not selected; not P0 | Source audit and SAWA lessons require caution. |
+| Signal-source connectors | Individual providers not selected; source acquisition and core subscription/GMP interconnection are P0 | Benchmark free/permitted access, coverage, timestamps, history, terms and failure behaviour for QIB/NII/retail subscription and named unofficial GMP sources before enabling a connector; broader news coverage can expand later, and Google Trends remains P2. |
 | Report export | HTML preview; DOCX first recommended; PDF later | Test offline export. |
 | Backup/restore | Required to be specified/tested before valuable data storage | No paid/cloud dependency. |
 | Background jobs | Not required initially | Profile first; add only for measured latency need. |
