@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -74,7 +74,7 @@ def list_cases(
 
 @router.post("/cases", response_model=CaseDetail, status_code=201)
 def create_case(payload: CreateCaseRequest, db: Session = Depends(get_db)) -> CaseDetail:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     case = ResearchCase(
         entered_name=payload.entered_name,
         title=payload.title or payload.entered_name,
