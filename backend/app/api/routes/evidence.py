@@ -13,6 +13,7 @@ from app.config import get_settings
 from app.db import get_db
 from app.models import EvidenceItem as EvidenceModel, ResearchCase
 from app.schemas.evidence import CreateEvidenceRequest, EvidenceItem, EvidenceListResponse
+from app.schemas.evidence_review import ReviewEvidenceRequest
 
 router = APIRouter()
 
@@ -190,3 +191,33 @@ def download_evidence(case_id: str, evidence_id: str, db: Session = Depends(get_
     if base not in path.parents or not path.is_file():
         raise HTTPException(status_code=404, detail="The original evidence file is unavailable.")
     return FileResponse(path, media_type="application/pdf", filename=item.original_file_name or "evidence.pdf")
+
+
+
+@router.post("/cases/{case_id}/evidence/{evidence_id}/review", response_model=EvidenceItem)
+def review_evidence(
+    case_id: str,
+    evidence_id: str,
+    payload: ReviewEvidenceRequest,
+    db: Session = Depends(get_db),
+) -> EvidenceItem:
+    item = get_evidence(db, case_id, evidence_id)
+    if payload.action == "verify":
+        item.verification_status = "user_verified"
+    elif payload.action == "mark_conflicted":
+        if not payload.rationale or not payload.rationale.strip():
+            raise HTTPException(status_code=422, detail="A rationale is required when marking evidence conflicted.")
+        item.verification_status = "conflicting"
+    else:
+        item.verification_status = "rejected"
+    if payload.rationale and payload.rationale.strip():
+        item.notes = (item.notes + "\n\nReview: " if item.notes else "Review: ") + payload.rationale.strip()
+    case = db.get(ResearchCase, item.case_id)
+    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    if case is not None:
+        case.updated_at = now
+        case.last_activity_at = now
+        case.case_changed_since_last_run = True
+    db.commit()
+    db.refresh(item)
+    return serialize(item)
