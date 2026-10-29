@@ -10,7 +10,7 @@ converted_on: 2026-10-29
 
 *Project Scope, Core Vision & Technical Brief*
 
-A local-first, evidence-driven research system for evaluating Indian IPOs primarily for listing-day exits.
+A local-first, evidence-driven research system for evaluating Indian Mainboard IPOs primarily for listing-day exits.
 
 **Status:** Planning brief — agree on requirements and architecture before further implementation.
 
@@ -22,6 +22,17 @@ A local-first, evidence-driven research system for evaluating Indian IPOs primar
 > **CORE PRINCIPLE**
 > AI must not guess, invent missing numbers, fabricate sources, or perform financial arithmetic without independent validation. Every material conclusion must trace to evidence, a reproducible calculation, or an explicitly labelled hypothesis.
 
+
+## Binding Scope and Budget
+
+The product owner's binding constraints for this project are:
+
+- **Coverage:** Indian Mainboard IPOs only. SME IPOs are outside the MVP and must not be implemented.
+- **Total budget:** ₹0. No paid API, dataset, AI service, hosting, software, upgrade, or paid fallback may be introduced.
+- **Operation:** Local-first and manual-first. Core research must work from user-provided documents and manual observations without requiring live source APIs or AI.
+- **Integrity:** Unknown is not zero; every material claim must be evidence-backed, a deterministic calculation, or explicitly identified as an interpretation/hypothesis.
+
+These constraints supersede any broader wording elsewhere in this planning brief.
 
 # 1. Executive Summary
 
@@ -597,7 +608,7 @@ Study of investor attention and IPO returns in Indian markets.
 
 
 > **ONE-SENTENCE DEFINITION**
-> A local-first, evidence-grounded IPO forensic research engine that analyzes Indian IPOs primarily for listing-day exits by combining offer-document research, verified financial calculations, company-specific risk checks, cross-indicator synchronization, time-sensitive demand/attention signals, historical backtesting and a detailed source-cited report—without inventing missing information or promising outcomes.
+> A local-first, evidence-grounded IPO forensic research engine that analyzes Indian Mainboard IPOs primarily for listing-day exits by combining offer-document research, verified financial calculations, company-specific risk checks, cross-indicator synchronization, time-sensitive demand/attention signals, historical backtesting and a detailed source-cited report—without inventing missing information or promising outcomes.
 
 **Historical planning note (superseded):** The original DOCX recommended creating the indicator catalogue next. That catalogue has since been created; converting it into canonical Markdown remains pending.
 
