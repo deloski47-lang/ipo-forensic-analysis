@@ -174,6 +174,9 @@ Database records store safe relative paths, never absolute paths. Public API res
 This is the planned application layout. Create files phase by phase when their responsibilities are implemented; do not create dozens of empty placeholders. File names are fixed unless a concrete technical incompatibility is documented and the change is recorded here.
 
     ipo-forensic-analysis/
+      .github/
+        workflows/
+          ci.yml
       README.md
       AGENTS.md
       CLAUDE.md
@@ -221,6 +224,7 @@ This is the planned application layout. Create files phase by phase when their r
             local-data.ts
             generated/
               schema.d.ts
+              .gitkeep
           components/
             layout/
               AppShell.tsx
@@ -284,6 +288,7 @@ This is the planned application layout. Create files phase by phase when their r
             global.css
         tests/
           setup.ts
+          App.test.tsx
           cases.test.tsx
           evidence.test.tsx
           facts.test.tsx
@@ -1413,7 +1418,11 @@ Signal checks combine available, valid, time-appropriate evidence from the appro
 - Playwright core path: create case → confirm identity with fixture evidence → add PDF/manual values → readiness → deterministic run → scenario → report preview/export → reopen after restart.
 - Accessibility: keyboard path, field-associated errors, visible focus, text labels for statuses and reduced-motion behaviour.
 
-### 15.3 Contract drift
+### 15.3 Continuous integration
+
+.github/workflows/ci.yml runs the backend pytest suite and frontend typecheck, lint, unit tests and production build on pushes to main/build branches and pull requests to main. CI is a verification mechanism, not a substitute for local review. Its results must be checked before merge; a green result does not approve an unverified data source or formula.
+
+### 15.5 Contract drift
 
 Required checks:
 1. Start backend and retrieve its OpenAPI schema.
