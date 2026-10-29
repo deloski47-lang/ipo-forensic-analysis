@@ -16,7 +16,7 @@ export interface CaseSummary {
   warningCount: number;
 }
 
-export interface CaseDetail extends CaseSummary {
+export interface CaseDetail extends Omit<CaseSummary, "issueDisplayName"> {
   issue: null;
   createdAt: string;
   updatedAt: string;
