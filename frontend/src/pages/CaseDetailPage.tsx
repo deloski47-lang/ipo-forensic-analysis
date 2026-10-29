@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
-import { apiGet } from "../api/client";
+import { apiGet, apiPost } from "../api/client";
 import { listEvidence, createEvidence, uploadEvidencePdf, type EvidenceItem } from "../api/evidence";
 import type { CaseDetail } from "../api/cases";
 
@@ -16,6 +16,9 @@ export default function CaseDetailPage() {
   const [sourceUrl, setSourceUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [issuerLegalName, setIssuerLegalName] = useState("");
+  const [issueDisplayName, setIssueDisplayName] = useState("");
+  const [identityEvidenceIds, setIdentityEvidenceIds] = useState<string[]>([]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -35,6 +38,26 @@ export default function CaseDetailPage() {
   }, [caseId]);
 
   useEffect(() => { void refresh(); }, [refresh]);
+
+  async function confirmIdentity(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setBusy(true);
+    try {
+      const updated = await apiPost<CaseDetail, {
+        manualIssue: { issuerLegalName: string; displayName: string; marketSegment: "MAINBOARD" };
+        identityEvidenceIds: string[];
+      }>(`/cases/${caseId}/identity/confirm`, {
+        manualIssue: { issuerLegalName: issuerLegalName.trim(), displayName: issueDisplayName.trim(), marketSegment: "MAINBOARD" },
+        identityEvidenceIds
+      });
+      setResearchCase(updated);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Identity could not be confirmed.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function addEvidence(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -75,7 +98,20 @@ export default function CaseDetailPage() {
     <section className="case-detail-grid">
       <div className="panel">
         <p className="eyebrow">IDENTITY</p><h2>Confirm the exact issue</h2>
-        <p className="muted">No automatic identity lookup is enabled yet. Add source-backed evidence first; identity confirmation will be built on this evidence register.</p>
+        {researchCase.identityStatus === "confirmed" && researchCase.issue ? <div className="confirmed-identity"><h3>{researchCase.issue.displayName}</h3><p className="muted">{researchCase.issue.issuerLegalName} · Mainboard</p><p className="muted">Manual identity confirmation saved. Dates and price fields remain unknown unless entered.</p></div> : <>
+          <p className="muted">No approved automatic identity source is enabled. Confirm manually only after adding source evidence and selecting it below.</p>
+          <form className="create-case-form" onSubmit={confirmIdentity}>
+            <label htmlFor="issuer-legal-name">Issuer legal name</label>
+            <input id="issuer-legal-name" value={issuerLegalName} onChange={e => setIssuerLegalName(e.target.value)} maxLength={200} required />
+            <label htmlFor="issue-display-name">IPO issue display name</label>
+            <input id="issue-display-name" value={issueDisplayName} onChange={e => setIssueDisplayName(e.target.value)} maxLength={200} required />
+            <fieldset className="identity-evidence-picker"><legend>Identity evidence (select at least one)</legend>
+              {evidence.length === 0 ? <p className="muted">Add evidence first.</p> : evidence.map(item => <label key={item.evidenceId} className="identity-evidence-option"><input type="checkbox" checked={identityEvidenceIds.includes(item.evidenceId)} onChange={e => setIdentityEvidenceIds(prev => e.target.checked ? [...prev, item.evidenceId] : prev.filter(id => id !== item.evidenceId))} /> <span>{item.title} <small>({item.verificationStatus.replaceAll("_", " ")})</small></span></label>)}
+            </fieldset>
+            <p className="muted">This records your manual confirmation; it does not independently verify the document. Missing dates and financial terms stay unknown.</p>
+            <button className="button button-primary create-button" disabled={busy || evidence.length === 0 || identityEvidenceIds.length === 0}>{busy ? "Confirming…" : "Confirm Mainboard identity"}</button>
+          </form>
+        </>
         <div className="detail-status-row"><span className="case-status status-identity_pending">{researchCase.caseStatus.replaceAll("_", " ")}</span><span className="identity-status">{researchCase.identityStatus.replaceAll("_", " ")}</span></div>
       </div>
       <div className="panel">
