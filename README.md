@@ -40,7 +40,7 @@ The working application changes are being built on a review branch from the scaf
 
 ### Prerequisites
 
-- Python 3.11 or newer.
+- Python 3.12 (recommended and used by CI). Python 3.14+ is not supported by the current dependency set.
 - Node.js 22.22 or newer (the chosen React Router v8 release requires Node.js 22.22+; the current Vite release also has a minimum Node.js version).
 - Git.
 
@@ -51,7 +51,7 @@ From the repository root, run `.\\scripts\\start-dev.ps1`. For manual setup, use
 ### Start the backend (Windows PowerShell)
 
     cd backend
-    py -m venv .venv
+    py -3.12 -m venv .venv
     .\.venv\Scripts\Activate.ps1
     python -m pip install --upgrade pip
     pip install -e ".[dev]"
@@ -69,4 +69,4 @@ Open http://127.0.0.1:5173. The screen should show whether the local API is reac
 
 ### Important current limitation
 
-The app currently supports local research cases, manual evidence registration, local PDF upload with SHA-256 hashes, evidence review, evidence-backed manual Mainboard identity confirmation, and readiness diagnostics. The formula registry, manual fact/observation review, acquisition attempts, deterministic analysis runs, scenarios, report generation, and backup/restore remain unimplemented. Do not treat readiness as an analysis result.
+The current build supports local research cases, evidence registration and review, evidence-backed manual Mainboard identity confirmation, manual facts and listing-signal observations, gross-return scenarios, partial immutable analysis runs, immutable HTML/DOCX reports, and local backup/restore. Automated source connectors and the complete financial formula/cross-signal engine are not yet implemented.
