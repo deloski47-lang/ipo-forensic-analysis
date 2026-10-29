@@ -30,7 +30,7 @@ def get_case(db: Session, case_id: str) -> ResearchCase:
 @router.get("/cases/{case_id}/analysis/readiness", response_model=AnalysisReadiness)
 def get_analysis_readiness(
     case_id: str,
-    information_cutoff_at: datetime | None = Query(default=None),
+    information_cutoff_at: datetime | None = Query(default=None, alias="informationCutoffAt"),
     db: Session = Depends(get_db),
 ) -> AnalysisReadiness:
     case = get_case(db, case_id)
