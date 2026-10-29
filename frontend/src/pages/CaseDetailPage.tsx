@@ -5,6 +5,7 @@ import { listEvidence, createEvidence, uploadEvidencePdf, reviewEvidence, type E
 import { getAnalysisReadiness, type AnalysisReadiness } from "../api/readiness";
 import type { CaseDetail } from "../api/cases";
 import ObservationsPanel from "./ObservationsPanel";
+import ScenariosPanel from "./ScenariosPanel";
 
 export default function CaseDetailPage() {
   const { caseId = "" } = useParams();
@@ -166,5 +167,6 @@ export default function CaseDetailPage() {
         </article>)}</div>}
     </section>
     <ObservationsPanel caseId={caseId} evidence={evidence} />
+    <ScenariosPanel caseId={caseId} />
   </main>;
 }
