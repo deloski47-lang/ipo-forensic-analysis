@@ -2,7 +2,7 @@
 title: IPO Forensic Analysis Engine — Database Schema
 document_id: DB-IPO-001
 version: 0.2
-status: Proposed SQLite schema v0.2 aligned to the frozen contract; migrations and runtime tests not implemented
+status: Proposed SQLite schema v0.2; initial migrations for research cases, evidence, issuers and Mainboard issues implemented on review branch; remaining schema and verification incomplete
 last_updated: 29 October 2026
 canonical_source: Markdown in GitHub
 scope: Indian Mainboard IPOs only; local-first; single-user; ₹0 budget

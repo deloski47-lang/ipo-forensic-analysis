@@ -11,7 +11,7 @@ router = APIRouter()
 
 @router.get("/health", response_model=HealthResponse)
 def health_check() -> HealthResponse:
-    """Report API and storage readiness without claiming database initialization."""
+    """Report API and local SQLite/data-directory readiness."""
     settings = get_settings()
     data_dir_ok = (
         settings.data_dir.is_dir()
