@@ -58,10 +58,11 @@ describe("research cases workspace", () => {
     render(<MemoryRouter initialEntries={["/cases"]}><AppRouter /></MemoryRouter>);
     fireEvent.change(screen.getByLabelText(/ipo or issuer name/i), { target: { value: "New Mainboard IPO" } });
     fireEvent.submit(screen.getByRole("button", { name: /create research case/i }).closest("form")!);
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringMatching(/\/cases$/),
-      expect.objectContaining({ method: "POST", body: JSON.stringify({ enteredName: "New Mainboard IPO" }) })
-    ));
+    await waitFor(() => expect(fetchMock.mock.calls.some(([url, init]) =>
+      String(url).endsWith("/cases") &&
+      (init as RequestInit | undefined)?.method === "POST" &&
+      (init as RequestInit | undefined)?.body === JSON.stringify({ enteredName: "New Mainboard IPO" })
+    )).toBe(true));
     expect(await screen.findByText("New Mainboard IPO")).toBeInTheDocument();
   });
 });
