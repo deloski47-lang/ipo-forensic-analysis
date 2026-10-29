@@ -132,18 +132,16 @@ The MVP must support:
 
 The MVP must not depend on any single paid, unverified or always-online API, and manual entry must remain available. However, source discovery/acquisition orchestration and core signal interconnection are intended MVP capabilities. On IPO entry/identity confirmation, the application must attempt retrieval through approved free/permitted source adapters for the signal categories that passed feasibility testing, including official category-wise subscription data and named unofficial GMP sources where a feasible route exists. If a source/category cannot be retrieved, show the exact source status and offer manual capture; never silently act as if the signal was checked. Before release, document representative-IPO coverage and resolve any critical signal category for which no lawful, free route is available. AI-assisted extraction remains optional and must fail safely to manual review.
 
-### 6.2 Follow-on release: market-signal enrichment
+### 6.2 Follow-on release: expanded market-signal coverage
 
-After the MVP works reliably, consider:
+The core MVP already includes source-acquisition orchestration and the first cross-signal relationships. Follow-on work expands coverage rather than postponing the product's defining capability. Prioritize:
+- additional approved connectors and broader coverage across IPOs/dates for category-wise subscription and named unofficial GMP publishers;
+- richer historical/time-series coverage for subscription and GMP, preserving all observation/publication/retrieval timestamps;
+- more official company/exchange/regulatory event coverage and compliant news discovery, with deduplication and event classification;
+- broader market/sector regime and comparable-IPO context and additional cross-indicator rules;
+- connectors for additional source categories only after access rights, field definitions, freshness, coverage, historical depth, cost and failure behaviour are verified.
 
-- timestamped subscription observations by investor category;
-- timestamped GMP observations from clearly labelled unofficial sources;
-- curated peer IPO records and comparable-company measures;
-- market/sector context and a more developed listing-day scenario engine;
-- replaceable news-provider adapter(s), deduplication and event classification;
-- improved source discovery and extraction automation.
-
-Any source integration is conditional on a data-source feasibility review. An integration must not be described as reliable until coverage, field definitions, timestamps, access terms, failure behaviour and historical availability are tested.
+No provider is presumed available or approved merely because a public page exists. A source/category with no verified free and permitted route must remain visibly unavailable and be escalated as a product-owner decision if it is critical to the promised workflow.
 
 ### 6.3 Later scope: validation and advanced analysis
 
@@ -525,7 +523,7 @@ A feature is not done merely because the screen or endpoint exists. A feature is
 
 This approved baseline tightens the previous draft in five ways:
 
-1. Clarifies that the MVP is a manual-first research and scenario-calculation tool, not a validated prediction engine.
+1. Clarifies that the MVP is an evidence-first research and scenario-calculation tool with IPO-triggered source-acquisition attempts, interconnected signals, and a complete manual/offline fallback—not a validated prediction engine.
 2. Makes AI-assisted extraction optional and preserves manual entry as a complete fallback.
 3. Makes the scenario-return formula and its inputs explicit and testable.
 4. Replaces the vague “at least one agreed set of metrics” acceptance criterion with a formula-register release gate.
