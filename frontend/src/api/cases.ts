@@ -17,7 +17,7 @@ export interface CaseSummary {
 }
 
 export interface CaseDetail extends Omit<CaseSummary, "issueDisplayName"> {
-  issue: null;
+  issue: { issueId: string; issuerLegalName: string; displayName: string; marketSegment: "MAINBOARD"; openDate: string | null; closeDate: string | null; listingDate: string | null; priceBandLow: string | null; priceBandHigh: string | null; issueSizeAmount: string | null; issueSizeUnit: string | null } | null;
   createdAt: string;
   updatedAt: string;
   caseChangedSinceLastRun: boolean;
