@@ -129,3 +129,17 @@ class MarketObservation(Base):
     reviewed_at: Mapped[str | None] = mapped_column(String(40), nullable=True)
     review_rationale: Mapped[str | None] = mapped_column(String(2000), nullable=True)
     supersedes_observation_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+
+
+class ScenarioDefinition(Base):
+    __tablename__ = "scenario_definitions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    case_id: Mapped[str] = mapped_column(String(36), ForeignKey("research_cases.id"), nullable=False, index=True)
+    label: Mapped[str] = mapped_column(String(100), nullable=False)
+    entry_price: Mapped[str] = mapped_column(String(64), nullable=False)
+    exit_price: Mapped[str] = mapped_column(String(64), nullable=False)
+    quantity: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    assumption_note: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    created_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now)
+    updated_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now)
