@@ -1,8 +1,8 @@
 ---
 title: IPO Forensic Analysis Engine — UI/UX Design Specification
 document_id: DESIGN-IPO-001
-version: 1.0
-status: Proposed design baseline; hero section intentionally reserved for product owner
+version: 1.1
+status: Design baseline updated; exact 21st.dev hero component remains product-owner-selected
 last_updated: 29 October 2026
 canonical_source: Markdown in GitHub
 scope: Indian Mainboard IPOs only; local-first; single-user; manual-first; ₹0 budget
@@ -52,7 +52,9 @@ Use these qualities as the design filter:
 
 **Decision recorded:** The hero section will be sourced from a selected hero component on 21st.dev. The product owner will choose the exact component and provide its component page/link or copied code. The exact component URL is not yet known and must not be guessed by Claude or another coding agent.
 
-The individual components in the 21st.dev registry can have their own dependencies and licence/usage terms. Before integrating the chosen component, inspect its actual source page, author, licence/usage conditions, required packages, assets and external requests. Use only a component that can be used within the **₹0 total project budget**. Do not purchase premium templates, paid copies, credits or subscriptions. Browsing/free copy limits may change; do not assume an unlimited free allowance.
+The individual components in the 21st.dev registry can have their own dependencies and licence/usage terms. Before integrating the chosen component, inspect its actual source page, author, licence/usage conditions, required packages, assets and external requests. Use only a component that can be used within the **₹0 total project budget**. Do not purchase premium templates, paid copies, credits or subscriptions. Browsing/free copy limits and plan descriptions may change; do not assume an unlimited free allowance or sign up for a paid tier.
+
+**Current terms check (29 October 2026):** 21st.dev's published Marketplace Terms (last updated 20 July 2026) state that components/materials belong to their respective authors and/or 21st Labs, restrict redistribution, and require a clear, visible link to the original component page when copying/redistributing a component to another medium. They also restrict reuse of marketplace previews/media and structured metadata without permission. Therefore, when a selected component is lawfully reusable in this project, preserve the author's attribution and include a clear, visible link near the hero or in a directly discoverable credits area to the exact original component page. Do not copy 21st.dev's screenshots, demo videos, thumbnails, preview layouts or unrelated site assets. If the chosen component's author licence or the terms applicable to the intended use are unclear, do not integrate it until clarified. References: [21st.dev Terms of Service](https://21st.dev/terms) and [21st.dev Plans & Pricing](https://21st.dev/plans).
 
 The hero must retain its selected source's intended look and motion as far as compatible with our product constraints, then be integrated into our design tokens and application structure without copying unrelated site-wide styles or scripts. The rest of the application must not be redesigned to imitate the source website.
 
@@ -68,7 +70,7 @@ Until the owner supplies the exact component:
 - Any external assets/font requests must have a fallback; the local-first app's core workflow cannot depend on the hero's remote assets loading.
 - Do not alter the global app-shell navigation or page-transition contract to imitate the source website if that breaks the established application flow.
 
-**Integration gate:** once the product owner supplies the exact 21st.dev component URL or code and identifies its intended screen, review it in isolation, record the author/source/licence, list its dependencies/assets/network requests, check compatibility with React and the existing motion package, adapt only what is necessary, and test responsiveness, accessibility, reduced motion and performance. Record the actual component URL and resulting dependency decision here in place. Until then, do not select or implement the hero on the owner's behalf.
+**Integration gate:** once the product owner supplies the exact 21st.dev component URL or code and identifies its intended screen, review it in isolation, record the author/source/licence, list its dependencies/assets/network requests, check compatibility with React and the existing motion package, adapt only what is necessary, and test responsiveness, accessibility, reduced motion and performance. Add the visible link to the exact original component page and author credit required by the applicable 21st.dev terms. If any required feature needs a paid component, subscription, AI credit, API or private package, stop and ask the owner rather than incur a cost; choose a compatible free component only with the owner's direction. Record the actual component URL and resulting dependency decision here in place. Until then, do not select or implement the hero on the owner's behalf.
 
 ---
 
@@ -885,23 +887,23 @@ These are intentionally left open rather than invented:
 
 Any agent building the UI must:
 
-1. Read AGENTS.md, app-flow.md, the PRD and Technical Design before implementing UI.
-2. In Claude Code, **use the Anthropic-verified Frontend Design UI/UX skill/plugin** before planning or implementing frontend UI. Official reference/installation page: https://claude.com/plugins/frontend-design. Check that it is available and invoke/apply it to the task; use its plan-and-critique workflow for hierarchy, layout, interaction and motion. If it is unavailable, do not claim it was used—tell the product owner and request that it be installed/enabled before frontend implementation proceeds.
-3. The skill is a design assistant, not the authority for this project's requirements: it must follow this document, the app flow and the approved product constraints. It must not override the exact palette/type decisions, invent the hero, add paid dependencies, or expand scope.
+1. Read `AGENTS.md`, `docs/app-flow.md`, the approved PRD and `docs/TECHNICAL_DESIGN.md` before implementing UI.
+2. In Claude Code, use Anthropic's verified **Frontend Design** plugin/skill for frontend and UI/UX work: https://claude.com/plugins/frontend-design. Invoke/apply it before planning or implementing visual UI, and use its design-planning and critique workflow for hierarchy, layout, interaction and motion. If unavailable, do not claim it was used; notify the product owner and request that it be enabled before frontend implementation proceeds.
+3. The Frontend Design skill is an assistant, not the authority for product requirements. It must follow this design document, `app-flow.md` and approved constraints. It must not alter the exact palette/type choices, invent the hero, add paid dependencies or expand scope.
 4. Treat this file as the design baseline for non-hero screens and interactions.
-3. Preserve the exact owner-provided palette and typography unless the owner changes them.
-4. Leave the hero entirely untouched until its source code and intended location are supplied.
-5. Never import a complete source website stylesheet globally to obtain one hero section.
-6. Keep CSS variables and motion tokens centralized; avoid per-component hard-coded animation timings.
-7. Use CSS transitions for simple states and the agreed Motion implementation for complex movement; do not add competing animation libraries casually.
-8. Respect reduced motion, keyboard access and high-contrast focus.
-9. Do not animate fake numbers, pretend loading progress or unpersisted state.
-10. Keep financial values, units, dates, status and provenance legible.
-11. Use real application data only; placeholder examples must be clearly marked in development and never passed off as real IPO data.
-12. Do not introduce paid fonts/assets, analytics, external trackers or required online services.
-13. Implement and test screen states, not only the happy path.
-14. If a desired hero/transition dependency conflicts with local-first operation, accessibility, performance or zero budget, explain the specific conflict and propose a compliant adaptation instead of silently weakening a constraint.
-15. Update this canonical design.md in place when approved design decisions change; do not create numbered/dated duplicate versions.
+5. Preserve the exact owner-provided palette and typography unless the owner changes them.
+6. Do not implement a hero until the product owner provides the exact 21st.dev component URL/code and intended placement.
+7. Review the selected component's author, licence and terms before integration. Use no paid component/plan/credit. Add a clear visible link back to the exact original component page and preserve attribution as required. Never copy marketplace previews/media or import a whole website's global styles.
+8. Keep CSS variables and motion tokens centralized; avoid per-component hard-coded animation timings.
+9. Use CSS transitions for simple states and the agreed free/open-source Motion package for complex movement; do not add competing animation libraries casually. Do not use Motion+ or private paid packages.
+10. Respect reduced motion, keyboard access and high-contrast focus.
+11. Do not animate fake numbers, pretend loading progress or unpersisted state.
+12. Keep financial values, units, dates, status and provenance legible.
+13. Use real application data only; placeholder examples must be clearly marked in development and never passed off as real IPO data.
+14. Do not introduce paid fonts/assets, analytics, external trackers or required online services.
+15. Implement and test screen states, not only the happy path.
+16. If a desired hero/transition dependency conflicts with local-first operation, accessibility, performance, licence terms or the zero budget, explain the specific conflict and request a decision rather than silently weakening a constraint.
+17. Update this canonical `design.md` in place when approved design decisions change; do not create numbered/dated duplicate versions.
 
 ---
 
