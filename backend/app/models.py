@@ -263,3 +263,21 @@ class ReportArtifact(Base):
     size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[str] = mapped_column(String(40), nullable=False)
     local_relative_path: Mapped[str] = mapped_column(String(500), nullable=False)
+
+
+class RestoreValidation(Base):
+    __tablename__ = "restore_validations"
+    __table_args__ = (
+        CheckConstraint("status IN ('valid', 'invalid', 'incompatible')", name="ck_restore_validations_status"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    status: Mapped[str] = mapped_column(String(16), nullable=False)
+    archive_relative_path: Mapped[str] = mapped_column(String(500), nullable=False)
+    archive_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    archive_size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
+    case_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    evidence_file_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    warnings_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
+    errors_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
+    validated_at: Mapped[str] = mapped_column(String(40), nullable=False)
