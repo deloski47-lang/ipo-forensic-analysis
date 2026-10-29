@@ -16,16 +16,16 @@ This document turns the approved product requirements and current technical/desi
 
 Use it together with the existing canonical files:
 
-1. [Project Brief](docs/IPO_Forensic_Analysis_Project_Brief_v1.0.md)
-2. [Approved PRD](docs/IPO_Forensic_Analysis_PRD_v1.0_APPROVED.md)
-3. [Indicator Catalogue & Data Dictionary](docs/IPO_Indicator_Catalogue_and_Data_Dictionary_v1.0.md)
-4. [Data Source & Feasibility Audit](docs/IPO_Data_Source_and_Feasibility_Audit_v1.0.md)
-5. [Application Flow](docs/app-flow.md)
-6. [UI/UX Design Specification](docs/design.md)
-7. [Technical Design](docs/TECHNICAL_DESIGN.md)
-8. [Proposed Database Schema v0.1](docs/database-schema.md)
-9. [Implementation Blueprint & Data Contract](docs/implementation-blueprint.md)
-9. [Repository rules](AGENTS.md)
+1. [Project Brief](IPO_Forensic_Analysis_Project_Brief_v1.0.md)
+2. [Approved PRD](IPO_Forensic_Analysis_PRD_v1.0_APPROVED.md)
+3. [Indicator Catalogue & Data Dictionary](IPO_Indicator_Catalogue_and_Data_Dictionary_v1.0.md)
+4. [Data Source & Feasibility Audit](IPO_Data_Source_and_Feasibility_Audit_v1.0.md)
+5. [Application Flow](app-flow.md)
+6. [UI/UX Design Specification](design.md)
+7. [Technical Design](TECHNICAL_DESIGN.md)
+8. [Proposed Database Schema v0.1](database-schema.md)
+9. [Implementation Blueprint & Data Contract](implementation-blueprint.md)
+10. [Repository rules](../AGENTS.md)
 
 If this plan conflicts with an approved requirement, the PRD and binding decisions in AGENTS.md take priority. A technology, provider or formula marked proposed/open remains unapproved until its stated gate is passed. Update this document in place as the sequence changes; use Git history rather than numbered duplicates.
 
