@@ -166,3 +166,12 @@ h2 { font-size: 23px; line-height: 1.2; letter-spacing: -.035em; margin-bottom: 
 .create-case-form input[type="file"] { padding: 9px; font-size: 12px; }
 @media (max-width: 900px) { .case-detail-grid { grid-template-columns: 1fr; } }
 @media (max-width: 620px) { .evidence-row { flex-direction: column; } .evidence-row .case-row-status { align-items: start; } }
+
+.identity-evidence-picker { margin: 8px 0; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); min-width: 0; }
+.identity-evidence-picker legend { padding: 0 4px; font-size: 12px; font-weight: 700; }
+.identity-evidence-option { display: flex; align-items: flex-start; gap: 9px; padding: 8px 0; font-weight: 400 !important; margin: 0 !important; }
+.identity-evidence-option input { width: auto; margin-top: 3px; }
+.identity-evidence-option span { font-size: 12px; overflow-wrap: anywhere; }
+.identity-evidence-option small { display: block; color: var(--text-muted); margin-top: 3px; }
+.confirmed-identity { margin-top: 20px; padding: 14px; border-radius: var(--radius-sm); background: #edf5eb; }
+.confirmed-identity h3 { margin: 0 0 6px; font-size: 16px; }
