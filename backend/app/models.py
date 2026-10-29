@@ -234,3 +234,32 @@ class Finding(Base):
     input_fact_ids_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
     input_observation_ids_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
     evidence_links_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
+
+
+class Report(Base):
+    __tablename__ = "reports"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    case_id: Mapped[str] = mapped_column(String(36), ForeignKey("research_cases.id"), nullable=False, index=True)
+    analysis_run_id: Mapped[str] = mapped_column(String(36), ForeignKey("analysis_runs.id"), nullable=False, index=True)
+    generated_at: Mapped[str] = mapped_column(String(40), nullable=False)
+    template_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    report_snapshot_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    issue_display_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    information_cutoff_at: Mapped[str] = mapped_column(String(40), nullable=False)
+    snapshot_json: Mapped[str] = mapped_column(String, nullable=False)
+
+
+class ReportArtifact(Base):
+    __tablename__ = "report_artifacts"
+    __table_args__ = (
+        CheckConstraint("format IN ('html', 'docx')", name="ck_report_artifacts_format"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    report_id: Mapped[str] = mapped_column(String(36), ForeignKey("reports.id"), nullable=False, index=True)
+    format: Mapped[str] = mapped_column(String(8), nullable=False)
+    sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[str] = mapped_column(String(40), nullable=False)
+    local_relative_path: Mapped[str] = mapped_column(String(500), nullable=False)
