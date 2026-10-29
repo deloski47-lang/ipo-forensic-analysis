@@ -8,7 +8,7 @@ MODULE_RANGES = {
     "DEM": 14, "GMP": 6, "NEWS": 12, "ATT": 6, "PEER": 10,
     "RISK": 12, "XCHK": 18, "DATA": 10,
 }
-_CODE_PATTERN = re.compile(r"^([A-Z]+)-(\\d{2})$")
+_CODE_PATTERN = re.compile(r"^([A-Z]+)-(\d{2})$")
 
 
 def is_registered_indicator(code: str) -> bool:
