@@ -253,7 +253,9 @@ Analysis must be modular and adaptive. Not every metric applies to every issuer;
 # 6. Cross-Indicator Synchronization and Contradiction Detection
 
 
-This is the defining capability. Connect indicators and evaluate competing explanations instead of merely listing metrics or summing independent scores.
+This is the defining capability and a core product requirement—not merely a later enhancement. Connect indicators and evaluate competing explanations instead of merely listing metrics or summing independent scores. The initial analysis must relate available company/offer fundamentals and valuation to category-wise subscription demand (QIB, NII and retail), GMP observations, market/sector context, relevant company events/news and comparable IPO outcomes where those signals are available. The system must show which relationships were tested, which inputs were unavailable or stale, and which relationships contradict one another.
+
+**Acquisition requirement:** entering an IPO name initiates issue/source discovery; once the issue is sufficiently identified, the system attempts retrieval through approved source connectors for supported signal categories. Manual entry and evidence upload remain required fallbacks and must work offline. “Manual-first” means evidence can always be supplied manually—it does not mean that the product should default to making the user find every time-sensitive signal herself/himself. No provider is considered usable until its access method, permitted use, field definitions, coverage and timestamp quality are tested. If no free and permitted retrieval route exists for a critical signal, that is a visible release-blocking product decision, not a silent scope reduction.
 
 
 | Relationship | Required investigation |
@@ -458,43 +460,31 @@ Keep the first version simple enough for one person to operate and debug. Separa
 
 # 12. Implementation Phases
 
+The phases below must not postpone the defining cross-signal capability or hide unverified source access. Source feasibility is tested early; automated adapters are implemented only for sources that pass the explicit acceptance gate.
 
+## Phase 0 — Requirements and source-feasibility gate
 
-## Phase 0 — Specification and source audit
+Finalize the signal relationships, report claims, data/evidence model and time-cutoff rules. Test a representative set of Mainboard IPOs against candidate sources for issue identity/terms, QIB/NII/retail subscription observations, named unofficial GMP observations, company disclosures/news and relevant market context. Record actual fields, observation timestamps, historical depth, access terms, cost, failure modes and coverage. A source must not be called feasible based only on a webpage existing.
 
+## Phase 1 — IPO discovery, signal acquisition and evidence-first core
 
-Finalize report schema, indicator catalogue, source hierarchy, evidence model, business-specific checks and target outcome. Test source availability on a sample of past IPOs.
+Implement the IPO-name entry/discovery flow and a source-acquisition orchestrator for approved connectors. The orchestrator attempts supported lookups after identity resolution, records per-source outcomes and timestamps, and shows unavailable/unsupported/stale/conflicting states. Preserve manual entry and document upload as complete fallbacks. A draft case and the core app must still work offline.
 
+## Phase 2 — Core interconnected forensic analysis
 
-## Phase 1 — Manual-first report engine
+Ship a tested first set of cross-indicator checks as part of the core analysis, not as a separate optional product. Include financial quality vs cash flow, revenue vs receivables/concentration, valuation vs fundamentals/peers, and listing-demand relationships such as QIB/NII/retail subscription vs valuation, GMP, offer size/free float and market/sector conditions. Findings must preserve confirming and disconfirming evidence, timestamps, limitations and missing prerequisites.
 
+## Phase 3 — Expand approved time-sensitive source integrations
 
-User enters IPO details and uploads RHP/DRHP, financials and CSVs/PDFs. Extract facts with citations, calculate core ratios, produce a report and show missing items.
-
-
-## Phase 2 — Cross-indicator forensic checks
-
-
-Implement earnings quality, concentration, valuation, governance, offer structure and contradiction rules, with traceable explanations and uncertainty handling.
-
-
-## Phase 3 — Time-sensitive market signals
-
-
-Add timestamped subscription data, GMP history, market/sector context, news monitoring and Google Trends if accessible.
-
+Improve coverage and freshness for subscription, unofficial GMP, official company/exchange events, news and market/sector context where a tested, free/permitted route exists. Add time-series views, source disagreement handling, deduplication and richer refresh behaviour. Do not make Google Trends or any one external provider a dependency.
 
 ## Phase 4 — Historical dataset and backtesting
 
+Build point-in-time history that includes weak and poor listings, not only winners. Enforce information cutoffs and evaluate whether each added signal contributes out-of-sample value. No probability/accuracy claim before proper validation.
 
-Build timestamp-safe history, evaluate baselines and candidate features, test out-of-sample results and track paper predictions.
+## Phase 5 — Broader validated automation
 
-
-## Phase 5 — Carefully validated automation
-
-
-Automate only reliable, permitted, maintainable source adapters and extraction; retain manual upload/correction.
-
+Automate additional source retrieval and document extraction only when reproducibility, source permissions, coverage and error handling are demonstrated. Retain manual correction and evidence review; never make an extraction result authoritative merely because it was automated.
 
 # 13. Initial MVP Acceptance Criteria
 
