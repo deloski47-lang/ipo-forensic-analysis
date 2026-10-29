@@ -489,7 +489,11 @@ Automate additional source retrieval and document extraction only when reproduci
 # 13. Initial MVP Acceptance Criteria
 
 
-- [ ] Create an IPO case by name and confirm the correct issuer/issue.
+- [ ] Create a Mainboard IPO case by name, resolve/confirm the correct issuer/issue, and attempt acquisition through approved source connectors after identity confirmation.
+
+- [ ] Show a per-source acquisition summary: attempted/succeeded/partial/unavailable/blocked, returned fields, source and observation/publication/retrieval timestamps, freshness, and manual fallback. Never imply a source was checked when it was not.
+
+- [ ] Interconnect the first validated financial/offer/valuation checks with available QIB/NII/retail subscription and named unofficial GMP observations; show missing, stale, conflicting or asynchronous signal limitations rather than inventing values.
 
 - [ ] Upload a prospectus and supporting files without live data access.
 
