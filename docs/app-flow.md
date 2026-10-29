@@ -27,7 +27,7 @@ Read this document together with the repository's existing canonical files:
 4. Indicator Catalogue & Data Dictionary — indicator meaning, data status and formula requirements.
 5. Technical Design — proposed architecture, module responsibilities, persistence, validation, reporting and testing.
 
-This document describes **user-visible flow and interaction behaviour**. The Technical Design describes **how the application is structured technically**. The Database Schema will later describe **how persistent records and relationships are stored**. The Data Contract will later define **exact field names, types, API requests/responses and status enums**. The UI/UX Design will later define **visual layout, component styling and responsive behaviour**.
+This document describes **user-visible flow and interaction behaviour**. The Technical Design describes **how the application is structured technically**. The proposed [Database Schema](database-schema.md) v0.1 defines the initial SQLite persistence entities, fields and relationships; it still requires alignment with the first Data Contract and migration tests. The Data Contract will define **exact API field names, types, requests/responses and wire status enums**. The UI/UX Design defines **visual layout, component styling and responsive behaviour**.
 
 Do not copy all of these subjects into each document. Link them and keep one authoritative home for each decision.
 
@@ -1432,7 +1432,7 @@ Record unresolved decisions in the relevant existing canonical document, then re
 - **app-flow.md:** screens, user journeys, transitions, prerequisites, visible statuses and failure recovery.
 - **design.md:** visual layout, wireframes, reusable components, interactions and accessibility presentation.
 - **TECHNICAL_DESIGN.md:** architecture, module ownership, storage and testing strategy.
-- **database-schema.md:** actual persisted entities/relationships/constraints after the flows and architecture are reviewed.
+- **database-schema.md:** proposed v0.1 persisted entities/relationships/constraints; validate and align it with the first Data Contract before migrations are implemented.
 - **Data Contract:** exact API and module input/output structures, before dependent endpoint implementation.
 - **implementation-plan.md:** build order and measurable delivery gates.
 
