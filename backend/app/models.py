@@ -95,3 +95,37 @@ class IpoIssue(Base):
     issue_size_unit: Mapped[str | None] = mapped_column(String(32), nullable=True)
     created_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now)
     updated_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now, onupdate=utc_now)
+
+
+class MarketObservation(Base):
+    __tablename__ = "market_observations"
+    __table_args__ = (
+        CheckConstraint("signal_category IN ('issue_terms', 'company_financials', 'valuation', 'subscription_qib', 'subscription_nii', 'subscription_retail', 'gmp', 'market_context', 'company_events')", name="ck_market_observations_signal_category"),
+        CheckConstraint("review_status IN ('candidate', 'accepted', 'rejected', 'conflicted', 'superseded')", name="ck_market_observations_review_status"),
+        CheckConstraint("entry_method IN ('manual', 'extracted_candidate', 'imported', 'connector', 'derived')", name="ck_market_observations_entry_method"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    case_id: Mapped[str] = mapped_column(String(36), ForeignKey("research_cases.id"), nullable=False, index=True)
+    indicator_code: Mapped[str] = mapped_column(String(16), nullable=False, index=True)
+    signal_category: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    segment: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    raw_value_text: Mapped[str] = mapped_column(String(5000), nullable=False)
+    value_numeric: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    value_text: Mapped[str | None] = mapped_column(String(5000), nullable=True)
+    unit: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    currency: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    metric_definition: Mapped[str] = mapped_column(String(2000), nullable=False)
+    observed_at: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    published_at: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    retrieved_at: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    recorded_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now)
+    source_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    acquisition_attempt_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    evidence_id: Mapped[str] = mapped_column(String(36), ForeignKey("evidence_items.id"), nullable=False, index=True)
+    entry_method: Mapped[str] = mapped_column(String(24), nullable=False, default="manual")
+    review_status: Mapped[str] = mapped_column(String(24), nullable=False, default="candidate", index=True)
+    definition_metadata_json: Mapped[str] = mapped_column(String, nullable=False, default="{}")
+    reviewed_at: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    review_rationale: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    supersedes_observation_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
