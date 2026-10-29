@@ -77,7 +77,7 @@ Build a **local-first modular monolith**: a small web frontend, a local Python A
 | Document processing | Manual review first; extraction is optional and candidate-only | PDF tables, footnotes, units and scans are error-prone; manual entry must remain complete. |
 | Reports | Structured report model, HTML preview, DOCX-first polished export | Separates report content from rendering; DOCX is the PRD's recommended first export. PDF may follow after an offline conversion test. |
 | AI | Optional, isolated adapter only; no AI provider is required | The core workflow must work at ₹0 and survive the absence of any free-tier service. |
-| External data | No live provider integration required for P0 | The audit has not established a dependable, unrestricted, free automated pipeline for all needed fields. |
+| External data and source acquisition | A core source-acquisition orchestrator plus individually approved adapters; retrieval is attempted for supported signal categories after IPO identity resolution | The audit has not established universal free automated coverage, so each connector requires a verified feasibility/rights gate and visible gaps. The product requirement is to attempt acquisition and interconnect available signals—not to pretend every source is available. |
 | Runtime | Local development processes bound to loopback | No cloud deployment or public network exposure is required for the MVP. |
 | Tests | Backend unit/integration tests, frontend tests, API contract tests and an end-to-end acceptance path | A polished report is not trustworthy unless arithmetic, statuses, lineage and interfaces are tested. |
 
@@ -531,9 +531,15 @@ A later run must not rewrite a previous run or report.
 
 Build a report from a saved run. Rendering does not recalculate, fetch new sources, or silently fill missing content. The report builder creates the report model; templates only render it.
 
-### 8.9 Optional adapters
+### 8.9 Source-acquisition orchestrator and adapters
 
-Each optional source or AI adapter has a narrow interface, explicit mapping, timeouts, failure handling and tests. It cannot bypass evidence/fact validation. No adapter belongs on the core startup path if the manual workflow can run without it.
+**The acquisition orchestrator is core MVP functionality. Individual external source connectors are approved one at a time after feasibility testing.** Keep each connector behind a narrow provider-neutral interface with explicit field mapping, source identity, timeout, retry/rate-limit handling, access/usage constraints, timestamp semantics, coverage declaration and tests.
+
+After an IPO is identified, the orchestrator attempts enabled, approved connectors for supported signal categories, prioritizing issue/offer identity and terms, official category-wise subscription (QIB/NII/retail), named unofficial GMP publishers, official company/exchange/regulatory events, and relevant news/market context where a free and permitted path is verified. Do not imply all categories are available automatically until the source benchmark proves it.
+
+The orchestrator records every attempt and result: connector and source, attempt/capture time, returned fields, publication/observation time, partial coverage, freshness, error/blocked/unavailable status, and applicable terms/limitations. It never fabricates a value, replaces one provider's value with another without provenance, or promotes a raw observation straight into a trusted fact. It feeds candidate observations into the existing validation/review flow.
+
+Manual entry, document registration and import remain complete fallbacks. Missing internet, a denied request, rate limit, source change, absent credential, empty response or unavailable source must not block local case creation, independent valid calculations or report generation; affected signal-dependent checks must instead report why they could not run. Never use an undocumented or prohibited endpoint, evade access controls, or secretly fall back to a paid provider.
 
 ---
 
@@ -543,10 +549,13 @@ Each optional source or AI adapter has a narrow interface, explicit mapping, tim
 
 1. User submits an IPO name and available identifiers.
 2. API validates the request shape and creates a research case.
-3. Identity handling uses only supported/manual or approved evidence; automated live resolution is not required.
-4. If identity is ambiguous, the case is flagged and the user must resolve it before a finalized analysis.
-5. The UI shows the case and an evidence checklist.
-6. The case can be saved and reopened.
+3. The app attempts issue/source discovery using reviewed and approved sources; any candidate match must carry source provenance. Do not assume an unrestricted public search API exists.
+4. If identity is ambiguous, show the candidate matches and supporting identifiers and ask the user to confirm or correct the issue before acquisition results are attached to it or a finalized analysis can run.
+5. After identity is confirmed, trigger the core acquisition orchestrator for enabled/approved source connectors and the signal categories they support.
+6. Persist and show per-source outcomes, returned fields, source and observation/publication/retrieval timestamps, partial coverage, staleness, conflicts, unavailable categories and blocked/failed attempts. A failed or unavailable connector is not equivalent to a zero value or a successful check.
+7. The UI shows the case, acquisition summary and evidence checklist. The user can retry, open the source, import/register evidence or enter an observation manually.
+8. Case creation and the manual workflow remain usable offline; a lack of network must not prevent saving the draft or working with already stored evidence.
+9. The case can be saved and reopened.
 
 ### 9.2 Register evidence
 
@@ -927,7 +936,7 @@ A formula receives explicit validated inputs and returns a value plus status or 
 
 ### 15.3 Cross-check engine
 
-Start with a small high-value subset of catalogue relationships, for example:
+Core MVP includes a deliberately bounded, tested set of high-value relationships across the signal families—not a raw metric dump and not every catalogue indicator at once. At minimum, cover financial quality vs cash flow; revenue vs receivables/concentration; valuation vs fundamentals/peer context; and listing demand (QIB/NII/retail subscription) vs valuation, GMP, offer size/free float and market/sector context where the required inputs exist. Start with explicit, testable relationships such as:
 - PAT growth vs operating cash-flow support, other-income dependency and one-off effects.
 - Revenue growth vs receivables/debtor days and customer concentration.
 - Margin expansion vs input costs, discounts, one-off gains or capitalized costs when disclosed.
@@ -1042,15 +1051,16 @@ Do not add a queue or distributed job runner by default. Start with normal local
 
 ### 17.3 Configuration
 
-- Core MVP must not require external API keys.
-- Include an example configuration file only for documented optional future integrations; never commit credentials.
+- Core MVP must not require paid credentials or an AI API key. A connector may use a free credential only after its provider, terms, quotas, privacy, permitted-use scope and fallback have been reviewed and explicitly configured.
+- Include an example configuration file only for documented integrations; never commit credentials. Never assume that a free API key or tier exists until verified.
 - Ignore local database files, evidence, generated reports, caches, logs and real environment files in Git.
-- A missing optional credential disables that adapter with a clear status.
+- A missing optional credential disables that specific connector with a clear status; it must not disable manual workflows or the acquisition-status UI.
 - No fallback may secretly use a paid provider.
+- Distinguish *acquisition orchestration required by the product* from *provider-specific connectors whose availability and permission must be proven*.
 
 ### 17.4 Internet requirement
 
-After installation, the core case/evidence/calculation/report workflow must work without internet. Users can research source material externally and register it manually. Avoid arbitrary URL fetching in P0. If retrieval is later added, restrict it to reviewed source domains, enforce timeouts/size limits, validate redirects and document access terms.
+After installation, the local case/evidence/calculation/report workflow must continue to work without internet using stored or manually supplied information. When online, the P0 acquisition orchestrator may fetch only through reviewed, approved source adapters/domains; do not accept arbitrary URL fetching as an unrestricted server-side proxy. Enforce timeouts, response-size limits, redirect/domain checks, sensible rate limits, access/usage terms and source-specific error handling. Offline mode must clearly distinguish unavailable live retrieval from a successful refresh; users can continue with saved/manual data.
 
 ---
 
