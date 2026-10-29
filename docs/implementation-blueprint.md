@@ -1422,7 +1422,7 @@ Signal checks combine available, valid, time-appropriate evidence from the appro
 
 .github/workflows/ci.yml runs the backend pytest suite and frontend typecheck, lint, unit tests and production build on pushes to main/build branches and pull requests to main. CI is a verification mechanism, not a substitute for local review. Its results must be checked before merge; a green result does not approve an unverified data source or formula.
 
-### 15.5 Contract drift
+### 15.4 Contract drift
 
 Required checks:
 1. Start backend and retrieve its OpenAPI schema.
