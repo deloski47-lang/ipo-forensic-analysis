@@ -12,6 +12,7 @@ def test_manual_identity_requires_case_owned_evidence(local_data_dir: Path) -> N
             f"/api/v1/cases/{case['caseId']}/evidence",
             json={"evidenceKind": "manual_note", "title": "Offer details"},
         ).json()
+        client.post(f"/api/v1/cases/{case['caseId']}/evidence/{evidence['evidenceId']}/review", json={"action": "verify", "rationale": "Reviewed against the offer document."})
         response = client.post(
             f"/api/v1/cases/{case['caseId']}/identity/confirm",
             json={
