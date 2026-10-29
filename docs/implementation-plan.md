@@ -24,6 +24,7 @@ Use it together with the existing canonical files:
 6. [UI/UX Design Specification](docs/design.md)
 7. [Technical Design](docs/TECHNICAL_DESIGN.md)
 8. [Proposed Database Schema v0.1](docs/database-schema.md)
+9. [Implementation Blueprint & Data Contract](docs/implementation-blueprint.md)
 9. [Repository rules](AGENTS.md)
 
 If this plan conflicts with an approved requirement, the PRD and binding decisions in AGENTS.md take priority. A technology, provider or formula marked proposed/open remains unapproved until its stated gate is passed. Update this document in place as the sequence changes; use Git history rather than numbered duplicates.
@@ -74,7 +75,7 @@ Do not introduce Redis, queues, a hosted database, paid UI kits, analytics, cont
 
 Each phase has a concrete exit gate. Build an end-to-end vertical slice incrementally; do not create empty folders or non-functional screens for every feature upfront.
 
-### Phase 0 — Freeze the first-slice decisions
+### Phase 0 — Implement the frozen blueprint and validate first-slice decisions
 
 **Deliverables**
 - A short first-slice scope: create/resolve a Mainboard issue, create a research case, register evidence and manual observations, record acquisition statuses, run a small approved set of formulas/checks, save a run snapshot, and preview/export a traceable report.
@@ -277,7 +278,7 @@ Every data-backed view needs loading, empty, validation, failure, partial, stale
 
 **Hero-specific hold:** the design spec reserves selection of the exact 21st.dev hero component and its intended screen for the product owner. Do not invent, clone or implement a placeholder hero as if final. This does not block the API, database, case workflow or non-hero application shell. Before integrating the chosen component, verify its author/licence, attribution, dependencies, network requests, compatibility, responsiveness, accessibility and INR 0 fit.
 
-## 9. Decisions still open (do not silently invent)
+## 10. Decisions still open (do not silently invent)
 
 - Final first-slice Data Contract and exact enums/property names.
 - Final schema adjustments and migration mechanism after validating the recommended SQLAlchemy/Alembic setup.
@@ -291,7 +292,7 @@ Every data-backed view needs loading, empty, validation, failure, partial, stale
 
 Do not let future P1/P2 choices block the scaffold or provider-neutral/manual-first vertical slice. Do block the affected feature when its missing decision would make it unsafe or untestable.
 
-## 10. Out of scope until P0 passes
+## 11. Out of scope until P0 passes
 
 - Automated historical backfill or predictive model calibration.
 - Google Trends/search-attention as a launch dependency.
@@ -301,7 +302,7 @@ Do not let future P1/P2 choices block the scaffold or provider-neutral/manual-fi
 - Broker integration/order execution, login, multi-user features, public hosting, cloud database, paid APIs/AI/OCR or managed infrastructure.
 - Automatic source adapters for providers that have not passed their own free/permitted-use and data-quality gate.
 
-## 11. Definition of done for the MVP
+## 12. Definition of done for the MVP
 
 The MVP is ready for release only when:
 
@@ -319,3 +320,10 @@ The MVP is ready for release only when:
 - The source audit and release notes state the actual status of each connector and resolve any critical free/permitted-source gap by explicit product-owner decision.
 
 The objective is not maximum automation on paper. It is a working, auditable and locally usable forensic workflow whose automated results are enabled only when their evidence and permissions support them.
+
+
+---
+
+## Contract implementation note — 29 October 2026
+
+The P0 contract itself is no longer an open design item: exact routes, JSON fields/enums, response/request schemas, configuration variables and target source-file layout are frozen in [Implementation Blueprint & Data Contract](implementation-blueprint.md). Phase 0 must now validate the local toolchain against that blueprint; Phase 2 implements the Pydantic/OpenAPI contract, generates TypeScript types and aligns/tests the database migration. Provider terms/source feasibility and the first formula register remain real gates; do not conflate these with contract design.
