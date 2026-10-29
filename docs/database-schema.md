@@ -1,8 +1,8 @@
 ---
 title: IPO Forensic Analysis Engine — Database Schema
 document_id: DB-IPO-001
-version: 0.1
-status: Proposed persistence baseline; align to docs/implementation-blueprint.md before migrations
+version: 0.2
+status: Proposed SQLite schema v0.2 aligned to the frozen contract; migrations and runtime tests not implemented
 last_updated: 29 October 2026
 canonical_source: Markdown in GitHub
 scope: Indian Mainboard IPOs only; local-first; single-user; ₹0 budget
@@ -12,7 +12,7 @@ scope: Indian Mainboard IPOs only; local-first; single-user; ₹0 budget
 
 ## 1. Purpose and status
 
-This document defines the **first concrete persistence schema** for the MVP vertical slice. It complements, rather than replaces, the Indicator Catalogue & Data Dictionary and Technical Design.
+This document defines the proposed concrete SQLite persistence schema for the MVP. It complements, rather than replaces, the Indicator Catalogue & Data Dictionary, Technical Design and [Implementation Blueprint & Data Contract](implementation-blueprint.md).
 
 **Status: proposed v0.1 persistence baseline.** The API/Data Contract has now been frozen in [Implementation Blueprint & Data Contract](implementation-blueprint.md). This existing schema document predates that contract and has known alignment work below; do not implement migration 0001 until the two agree and representative IPO fixtures/tests are ready. This document is a schema proposal, not an implemented or runtime-tested database.
 
@@ -40,81 +40,99 @@ The schema supports the required workflow:
 
 ## 3. Relationships
 
-```text
+~~~
 Issuer ──< IPO Issue ──< Research Case
                     └──< Issue Identifier
 
-Research Case ──< Evidence Item >── Source
-      │                  │
-      ├──< Acquisition Attempt >── Source (optional)
-      ├──< Fact Record ─────────── Evidence Item
-      ├──< Market Observation ──── Evidence Item / Source / Acquisition Attempt
+Research Case ──< Identity Candidate
+      │
+      ├──< Evidence Item >── Source
+      ├──< Acquisition Attempt >── Source
+      ├──< Fact Record >── Evidence Item
+      ├──< Market Observation >── Evidence Item / Source / Acquisition Attempt
       └──< Analysis Run
+               ├──< Analysis Result
                ├──< Finding ──< Finding Evidence Link >── Evidence Item
-               ├──< Scenario Result
-               └──< Report Artifact
-```
+               ├──< Scenario Result >── Scenario Definition
+               └──< Report ──< Report Artifact
+~~~
 
-A case may be created before identity resolution, so research_cases.issue_id is nullable until confirmation. A completed analysis run requires a confirmed issue identity and stores an information cutoff plus an immutable input snapshot.
+A research case may exist before identity resolution, so research_cases.issue_id is nullable until the user confirms an evidence-backed Mainboard issue. Identity candidates are stored separately from confirmed ipo_issues. A completed or partial analysis run requires confirmed identity and stores a cutoff and immutable input snapshot. A report is a saved model/snapshot; report artifacts are optional rendered files belonging to that report.
 
 ## 4. Initial table definitions
 
-This is the logical schema baseline for SQLite migrations. Timestamps are ISO 8601 strings with explicit UTC offsets (UTC preferred); date-only fields use YYYY-MM-DD. UUIDs are stored as text. JSON columns must be validated by application schemas before persistence.
+This is the proposed logical schema for Alembic migration 0001. Database column names are snake_case. UUID identifiers are stored as TEXT; date-only values use YYYY-MM-DD; instants are persisted as UTC ISO 8601/RFC 3339 strings; unknown source timestamps remain nullable. JSON columns must be validated by Pydantic/application schemas before persistence. Financial decimal values are canonical decimal strings in TEXT columns, not SQLite REAL values.
 
 ### 4.1 Identity and research case
 
 | Table | Fields and constraints | Purpose |
 |---|---|---|
-| issuers | id TEXT PK; legal_name TEXT NOT NULL; created_at TEXT NOT NULL; updated_at TEXT NOT NULL | Company identity, separate from each issue. |
-| ipo_issues | id TEXT PK; issuer_id TEXT FK; display_name TEXT NOT NULL; issue_type TEXT CHECK = 'MAINBOARD'; open_date TEXT; close_date TEXT; listing_date TEXT; price_band_low TEXT; price_band_high TEXT; issue_size_amount TEXT; issue_size_unit TEXT; identity_status TEXT CHECK IN ('candidate','confirmed','rejected'); created_at TEXT NOT NULL; updated_at TEXT NOT NULL | One distinct public issue. Terms stay nullable until supported by evidence. |
-| issue_identifiers | id TEXT PK; issue_id TEXT FK; identifier_type TEXT NOT NULL; identifier_value TEXT NOT NULL; source_id TEXT FK nullable; evidence_id TEXT FK nullable; observed_at TEXT; unique on (identifier_type, identifier_value, issue_id) pending namespace review | Exchange/provider identifiers and identity-resolution evidence. |
-| research_cases | id TEXT PK; issue_id TEXT FK nullable; entered_name TEXT NOT NULL; title TEXT NOT NULL; case_status TEXT CHECK IN ('identity_pending','active','archived'); created_at TEXT NOT NULL; updated_at TEXT NOT NULL | Saved investigation, including while IPO identity is unresolved. |
+| issuers | id TEXT PK UUID; legal_name TEXT NOT NULL; created_at TEXT NOT NULL; updated_at TEXT NOT NULL | Company identity, separate from each public issue. |
+| ipo_issues | id TEXT PK UUID; issuer_id TEXT NOT NULL FK issuers(id); display_name TEXT NOT NULL; market_segment TEXT NOT NULL CHECK = 'MAINBOARD'; open_date TEXT NULL; close_date TEXT NULL; listing_date TEXT NULL; price_band_low TEXT NULL; price_band_high TEXT NULL; issue_size_amount TEXT NULL; issue_size_unit TEXT NULL; created_at TEXT NOT NULL; updated_at TEXT NOT NULL | Confirmed issue record only. Candidate/ambiguous identity details remain in identity_candidates until confirmation. |
+| issue_identifiers | id TEXT PK UUID; issue_id TEXT NOT NULL FK ipo_issues(id); identifier_type TEXT NOT NULL; identifier_value TEXT NOT NULL; namespace TEXT NOT NULL; source_id TEXT NULL FK sources(id); evidence_id TEXT NULL FK evidence_items(id); observed_at TEXT NULL; UNIQUE(namespace, identifier_type, identifier_value, issue_id) | Exchange/provider identifiers with source namespace and evidence. Namespace prevents collisions when providers reuse identifier values. |
+| research_cases | id TEXT PK UUID; issue_id TEXT NULL FK ipo_issues(id); entered_name TEXT NOT NULL; title TEXT NOT NULL; case_status TEXT NOT NULL CHECK IN ('identity_pending','active','archived'); identity_status TEXT NOT NULL CHECK IN ('unresolved','ambiguous','confirmed','out_of_scope','rejected'); created_at TEXT NOT NULL; updated_at TEXT NOT NULL; last_activity_at TEXT NOT NULL | Saved research case. It may exist before the IPO identity is confirmed. |
+| identity_candidates | id TEXT PK UUID; case_id TEXT NOT NULL FK research_cases(id); issuer_legal_name TEXT NULL; display_name TEXT NOT NULL; market_segment TEXT NOT NULL CHECK IN ('MAINBOARD','SME','UNKNOWN'); open_date TEXT NULL; close_date TEXT NULL; listing_date TEXT NULL; price_band_low TEXT NULL; price_band_high TEXT NULL; issue_size_amount TEXT NULL; issue_size_unit TEXT NULL; source_id TEXT NULL FK sources(id); source_name_snapshot TEXT NOT NULL; source_url TEXT NULL; source_record_id TEXT NULL; evidence_ids_json TEXT NOT NULL; candidate_notes TEXT NULL; discovery_status TEXT NOT NULL CHECK IN ('candidate','confirmed','rejected'); discovered_at TEXT NOT NULL; reviewed_at TEXT NULL | Persisted identity-discovery candidate. Candidate values cannot be used as confirmed issue data automatically. |
 
-Rules:
-- Issue type is restricted to Indian Mainboard IPOs. SME IPOs are out of scope.
-- Similar display names alone cannot confirm identity.
-- The final identifier uniqueness rule must account for source/namespace so reused provider values do not incorrectly collide.
+Identity rules:
+- A confirmed issue must be MAINBOARD. SME and UNKNOWN candidates cannot be confirmed into a supported issue.
+- A research case can have issue_id = NULL with identity_status unresolved or ambiguous.
+- A confirmed case has issue_id populated and identity_status = confirmed.
+- Identity evidence IDs must reference evidence belonging to the same case; validate this in the application because a simple foreign key alone does not enforce case ownership.
+- Display-name similarity alone cannot confirm identity.
 
 ### 4.2 Source registry, evidence and acquisition attempts
 
 | Table | Fields and constraints | Purpose |
 |---|---|---|
-| sources | id TEXT PK; publisher_name TEXT NOT NULL; source_kind TEXT CHECK IN ('official','secondary','user_supplied','local_file','other'); canonical_url TEXT; authority_note TEXT; access_status TEXT CHECK IN ('unreviewed','approved','blocked','unavailable'); free_use_confirmed INTEGER CHECK IN (0,1); terms_reviewed_at TEXT; terms_note TEXT; created_at TEXT NOT NULL | Provider-neutral registry. Public visibility does not by itself grant scraping or reuse permission. |
-| evidence_items | id TEXT PK; case_id TEXT FK NOT NULL; source_id TEXT FK nullable; evidence_kind TEXT CHECK IN ('document','web_page','manual_note','manual_value','imported_file','other'); title TEXT NOT NULL; external_url TEXT; local_relative_path TEXT; sha256 TEXT; mime_type TEXT; source_version TEXT; published_at TEXT; captured_at TEXT NOT NULL; locator TEXT; verification_status TEXT CHECK IN ('unverified','reviewed','rejected','superseded'); notes TEXT; supersedes_evidence_id TEXT FK nullable | Preserved file, cited page, manual entry or other evidence. Store paths relative to app data, not absolute machine paths. |
-| acquisition_attempts | id TEXT PK; case_id TEXT FK NOT NULL; source_id TEXT FK nullable; adapter_key TEXT NOT NULL; signal_category TEXT NOT NULL; started_at TEXT NOT NULL; finished_at TEXT; attempt_status TEXT CHECK IN ('attempted','succeeded','partial','unavailable','blocked','failed'); returned_fields_json TEXT; failure_code TEXT; message TEXT; terms_snapshot TEXT | Auditable attempt and result, including partial results and failure reasons. |
+| sources | id TEXT PK UUID; publisher_name TEXT NOT NULL; source_kind TEXT NOT NULL CHECK IN ('official','secondary','user_supplied','local_file','other'); canonical_url TEXT NULL; authority_note TEXT NULL; access_status TEXT NOT NULL CHECK IN ('unreviewed','approved','blocked','unavailable'); connector_status TEXT NOT NULL CHECK IN ('enabled','not_enabled','blocked','unavailable'); free_use_confirmed INTEGER NULL CHECK IN (0,1); terms_reviewed_at TEXT NULL; terms_note TEXT NULL; created_at TEXT NOT NULL; updated_at TEXT NOT NULL | Provider-neutral source registry. Visibility does not imply permitted automated use. |
+| evidence_items | id TEXT PK UUID; case_id TEXT NOT NULL FK research_cases(id); source_id TEXT NULL FK sources(id); evidence_kind TEXT NOT NULL CHECK IN ('document','web_page','manual_note','manual_value','imported_file'); title TEXT NOT NULL; source_url TEXT NULL; original_file_name TEXT NULL; local_relative_path TEXT NULL; sha256 TEXT NULL; mime_type TEXT NULL; size_bytes INTEGER NULL; source_version TEXT NULL; published_at TEXT NULL; captured_at TEXT NOT NULL; recorded_at TEXT NOT NULL; locator TEXT NULL; verification_status TEXT NOT NULL CHECK IN ('unverified','reviewed','rejected','superseded'); notes TEXT NULL; supersedes_evidence_id TEXT NULL FK evidence_items(id) | Preserved original document, source capture, manual evidence or other evidence. Store relative paths only; absolute paths never go in the database/API. |
+| acquisition_attempts | id TEXT PK UUID; case_id TEXT NOT NULL FK research_cases(id); source_id TEXT NULL FK sources(id); adapter_key TEXT NOT NULL; signal_category TEXT NOT NULL; started_at TEXT NOT NULL; finished_at TEXT NULL; attempt_status TEXT NULL CHECK IN ('succeeded','partial','unavailable','blocked','failed'); returned_fields_json TEXT NULL; failure_code TEXT NULL; message TEXT NULL; terms_snapshot TEXT NULL | One real retrieval attempt and its result. attempt_status may be NULL only while a synchronous request is in progress; completed attempts must end in an allowed final status. |
 
 Evidence rules:
-- Calculate SHA-256 for uploaded files and preserve original bytes. A replacement is a new evidence version, not a silent overwrite.
-- A URL is not proof that retrieval succeeded. Capture status and times separately.
-- Manual entries can lack an external source, but must have an identifiable manual evidence item.
+- Calculate SHA-256 for uploaded originals and preserve their original bytes.
+- A replacement file is a new evidence item/version, never a silent overwrite.
+- A URL is not proof that retrieval succeeded. Capture actual result/status/times separately.
+- Manual entries can lack an external source but must have identifiable evidence.
 - Never store credentials, API keys, cookies or authentication tokens here.
+- Uploaded PDF metadata is local. P0 accepts PDF only with the maximum size enforced by IPOFA_MAX_UPLOAD_BYTES; verify file content, not just filename or browser MIME.
 
 ### 4.3 Company facts and time-sensitive observations
 
 | Table | Fields and constraints | Purpose |
 |---|---|---|
-| fact_records | id TEXT PK; case_id TEXT FK NOT NULL; indicator_code TEXT NOT NULL; raw_value_text TEXT; value_numeric TEXT; value_text TEXT; unit TEXT; currency TEXT; period_start TEXT; period_end TEXT; as_of_date TEXT; evidence_id TEXT FK NOT NULL; entry_method TEXT CHECK IN ('manual','extracted_candidate','imported','connector','derived'); review_status TEXT CHECK IN ('candidate','accepted','rejected','conflicted','superseded'); definition_note TEXT; created_at TEXT NOT NULL | Financial, company, governance, offer and other non-market facts with period and evidence lineage. |
-| market_observations | id TEXT PK; case_id TEXT FK NOT NULL; indicator_code TEXT NOT NULL; segment TEXT; raw_value_text TEXT; value_numeric TEXT; value_text TEXT; unit TEXT; metric_definition TEXT; observed_at TEXT; published_at TEXT; retrieved_at TEXT NOT NULL; source_id TEXT FK nullable; evidence_id TEXT FK NOT NULL; acquisition_attempt_id TEXT FK nullable; review_status TEXT CHECK IN ('candidate','accepted','rejected','conflicted','superseded'); metadata_json TEXT; created_at TEXT NOT NULL | Time-sensitive signals including QIB/NII/retail subscription, GMP, market context and event-linked observations. Distinct sources remain separate rows. |
+| fact_records | id TEXT PK UUID; case_id TEXT NOT NULL FK research_cases(id); indicator_code TEXT NOT NULL; raw_value_text TEXT NOT NULL; value_numeric TEXT NULL; value_text TEXT NULL; unit TEXT NULL; currency TEXT NULL; period_start TEXT NULL; period_end TEXT NULL; as_of_date TEXT NULL; evidence_id TEXT NOT NULL FK evidence_items(id); entry_method TEXT NOT NULL CHECK IN ('manual','extracted_candidate','imported','connector','derived'); review_status TEXT NOT NULL CHECK IN ('candidate','accepted','rejected','conflicted','superseded'); definition_note TEXT NULL; recorded_at TEXT NOT NULL; created_at TEXT NOT NULL; reviewed_at TEXT NULL; review_rationale TEXT NULL; supersedes_fact_id TEXT NULL FK fact_records(id) | Financial, company, governance, offer and other non-market facts with periods and evidence lineage. |
+| market_observations | id TEXT PK UUID; case_id TEXT NOT NULL FK research_cases(id); indicator_code TEXT NOT NULL; signal_category TEXT NOT NULL CHECK IN ('issue_terms','company_financials','valuation','subscription_qib','subscription_nii','subscription_retail','gmp','market_context','company_events'); segment TEXT NULL CHECK IN ('QIB','NII','RETAIL'); raw_value_text TEXT NOT NULL; value_numeric TEXT NULL; value_text TEXT NULL; unit TEXT NULL; currency TEXT NULL; metric_definition TEXT NOT NULL; observed_at TEXT NULL; published_at TEXT NULL; retrieved_at TEXT NULL; recorded_at TEXT NOT NULL; source_id TEXT NULL FK sources(id); evidence_id TEXT NOT NULL FK evidence_items(id); acquisition_attempt_id TEXT NULL FK acquisition_attempts(id); entry_method TEXT NOT NULL CHECK IN ('manual','extracted_candidate','imported','connector','derived'); review_status TEXT NOT NULL CHECK IN ('candidate','accepted','rejected','conflicted','superseded'); metadata_json TEXT NOT NULL; reviewed_at TEXT NULL; review_rationale TEXT NULL; supersedes_observation_id TEXT NULL FK market_observations(id) | Time-sensitive signal history, including QIB/NII/retail subscription, GMP, market context and event-linked observations. Distinct source records remain separate. |
 
 Data conventions:
-- Use stable indicator codes from the Indicator Catalogue & Data Dictionary. Do not invent code spellings in UI code.
-- For subscription, store category/segment separately (expected concepts: QIB, NII, RETAIL) and retain the source's denominator/definition in metric_definition or metadata_json.
-- For GMP, preserve raw form, unit/currency, publisher, publication/observation time and retrieval time. GMP is an unofficial secondary observation, not an official exchange fact.
-- Do not average conflicts or replace one source's value with another without provenance. Republished GMP values are not automatically independent evidence.
-- observed_at, published_at and retrieved_at are different facts. Unknown times remain null and must be presented as unknown.
-- Derived facts must remain traceable to formula/rule versions and source inputs through the run snapshot and findings.
+- Use stable indicator codes from the Indicator Catalogue & Data Dictionary. Never invent code spellings in UI code.
+- For subscription, store category/segment separately (QIB, NII, RETAIL) and preserve the source denominator/definition.
+- For GMP, preserve raw form, unit/currency, publisher, definition and all known timestamps. GMP is unofficial secondary evidence, not an official exchange fact.
+- Do not average conflicts or replace one source with another without provenance. Republished GMP values are not automatically independent evidence.
+- observed_at, published_at, retrieved_at and recorded_at are distinct. Unknown times remain NULL and must be presented as unknown.
+- The application assigns entry_method. Do not trust a client-supplied entry method.
+- A simple FK does not prove evidence/source/attempt belongs to the same case; repositories/services must validate parent ownership.
+- Derived results must remain traceable through analysis_results/input snapshots and findings.
 
-### 4.4 Runs, findings, scenarios and reports
+### 4.4 Runs and results, findings, scenarios and reports
 
 | Table | Fields and constraints | Purpose |
 |---|---|---|
-| analysis_runs | id TEXT PK; case_id TEXT FK NOT NULL; run_status TEXT CHECK IN ('queued','running','completed','failed'); information_cutoff_at TEXT NOT NULL; started_at TEXT NOT NULL; finished_at TEXT; schema_version TEXT NOT NULL; formula_set_version TEXT NOT NULL; rule_set_version TEXT NOT NULL; software_version TEXT; input_snapshot_json TEXT NOT NULL; error_summary TEXT | Reproducible run with an immutable snapshot of used inputs, evidence references and cutoff. |
-| findings | id TEXT PK; run_id TEXT FK NOT NULL; rule_code TEXT NOT NULL; rule_version TEXT NOT NULL; finding_type TEXT NOT NULL; severity TEXT CHECK IN ('info','low','medium','high','critical'); title TEXT NOT NULL; explanation TEXT NOT NULL; limitation_note TEXT; status TEXT CHECK IN ('active','unresolved','not_run','superseded'); created_at TEXT NOT NULL | Cross-signal findings, including contradictions and checks that could not run. |
-| finding_evidence_links | finding_id TEXT FK NOT NULL; evidence_id TEXT FK NOT NULL; link_role TEXT CHECK IN ('supports','contradicts','context'); composite PK (finding_id, evidence_id, link_role) | Links a finding to evidence supporting, contradicting or contextualizing it. |
-| scenario_results | id TEXT PK; run_id TEXT FK NOT NULL; scenario_key TEXT NOT NULL; scenario_label TEXT NOT NULL; assumptions_json TEXT NOT NULL; exit_price TEXT; gross_return_pct TEXT; estimated_costs TEXT; net_return_pct TEXT; calculation_status TEXT CHECK IN ('calculated','incomplete','not_applicable'); limitation_note TEXT; unique (run_id, scenario_key) | Conditional upside/base/downside cases; net return remains absent until fees, taxes, charges and slippage assumptions are defined and supplied. |
-| report_artifacts | id TEXT PK; run_id TEXT FK NOT NULL; format TEXT NOT NULL; local_relative_path TEXT NOT NULL; sha256 TEXT NOT NULL; generated_at TEXT NOT NULL; template_version TEXT NOT NULL | Exported report tied to a specific run. |
+| analysis_runs | id TEXT PK UUID; case_id TEXT NOT NULL FK research_cases(id); run_status TEXT NOT NULL CHECK IN ('completed','partial','failed'); information_cutoff_at TEXT NOT NULL; started_at TEXT NOT NULL; finished_at TEXT NULL; schema_version TEXT NOT NULL; formula_set_version TEXT NOT NULL; rule_set_version TEXT NOT NULL; software_version TEXT NULL; input_snapshot_json TEXT NOT NULL; input_snapshot_hash TEXT NOT NULL; error_summary TEXT NULL | Reproducible run with immutable selected inputs, evidence IDs and cutoff. Synchronous P0 responses persist final status. |
+| analysis_results | id TEXT PK UUID; run_id TEXT NOT NULL FK analysis_runs(id); indicator_code TEXT NOT NULL; result_key TEXT NOT NULL; calculation_status TEXT NOT NULL CHECK IN ('calculated','qualified','skipped','not_applicable','invalid'); value_decimal TEXT NULL; value_text TEXT NULL; unit TEXT NULL; currency TEXT NULL; display_value TEXT NULL; formula_code TEXT NULL; formula_version TEXT NULL; input_fact_ids_json TEXT NOT NULL; input_observation_ids_json TEXT NOT NULL; evidence_ids_json TEXT NOT NULL; explanation TEXT NOT NULL; reason TEXT NULL; UNIQUE(run_id, result_key) | One explicit calculation result per run/key, including skipped/invalid results and provenance. |
+| findings | id TEXT PK UUID; run_id TEXT NOT NULL FK analysis_runs(id); rule_code TEXT NOT NULL; rule_version TEXT NOT NULL; finding_type TEXT NOT NULL; severity TEXT NOT NULL CHECK IN ('info','low','medium','high','critical'); title TEXT NOT NULL; explanation TEXT NOT NULL; limitation_note TEXT NULL; status TEXT NOT NULL CHECK IN ('active','unresolved','not_run','superseded'); related_indicator_codes_json TEXT NOT NULL; input_fact_ids_json TEXT NOT NULL; input_observation_ids_json TEXT NOT NULL; created_at TEXT NOT NULL | Cross-signal findings including contradictions and checks that could not run. |
+| finding_evidence_links | finding_id TEXT NOT NULL FK findings(id); evidence_id TEXT NOT NULL FK evidence_items(id); link_role TEXT NOT NULL CHECK IN ('supports','contradicts','context'); note TEXT NULL; PRIMARY KEY (finding_id, evidence_id, link_role) | Evidence supporting, contradicting or contextualizing a finding. |
+| scenario_definitions | id TEXT PK UUID; case_id TEXT NOT NULL FK research_cases(id); label TEXT NOT NULL; entry_price TEXT NOT NULL; exit_price TEXT NOT NULL; quantity INTEGER NULL CHECK (quantity IS NULL OR quantity >= 1); assumption_note TEXT NULL; created_at TEXT NOT NULL; updated_at TEXT NOT NULL | User assumption set stored separately from a calculation result. Editing a saved scenario creates a new definition/version rather than mutating prior results. |
+| scenario_results | id TEXT PK UUID; run_id TEXT NOT NULL FK analysis_runs(id); scenario_id TEXT NOT NULL FK scenario_definitions(id); scenario_label_snapshot TEXT NOT NULL; entry_price TEXT NOT NULL; exit_price TEXT NOT NULL; quantity INTEGER NULL; gross_return_pct TEXT NULL; gross_profit_amount TEXT NULL; net_return_pct TEXT NULL; assumptions_json TEXT NOT NULL; calculation_status TEXT NOT NULL CHECK IN ('calculated','incomplete','not_applicable'); limitation_note TEXT NOT NULL; created_at TEXT NOT NULL; UNIQUE(run_id, scenario_id) | Conditional scenario result tied to a specific immutable run and copied assumptions. net_return_pct remains NULL in P0. |
+| reports | id TEXT PK UUID; case_id TEXT NOT NULL FK research_cases(id); run_id TEXT NOT NULL FK analysis_runs(id); title TEXT NOT NULL; issue_display_name TEXT NOT NULL; information_cutoff_at TEXT NOT NULL; template_version TEXT NOT NULL; report_snapshot_json TEXT NOT NULL; report_snapshot_hash TEXT NOT NULL; warnings_json TEXT NOT NULL; generated_at TEXT NOT NULL | Immutable structured report snapshot; exists independently of any export file. |
+| report_artifacts | id TEXT PK UUID; report_id TEXT NOT NULL FK reports(id); format TEXT NOT NULL CHECK IN ('html','docx'); local_relative_path TEXT NOT NULL; sha256 TEXT NOT NULL; size_bytes INTEGER NOT NULL CHECK (size_bytes >= 0); generated_at TEXT NOT NULL | Rendered export file tied to the saved report snapshot, not directly to mutable live facts. |
 
-**Run immutability:** completed runs and their findings/scenario outputs are historical. New evidence creates a new run; it does not rewrite old results. input_snapshot_json must capture exact canonical inputs, record/evidence IDs, units/periods, review states, time semantics, cutoff and formula/rule versions. Do not rely only on live database lookups to reconstruct an old report.
+Immutability rules:
+- Once saved, an analysis run's input snapshot/hash, calculation results and findings are historical and do not change.
+- A report snapshot records the selected run, actual values/statuses, evidence references, cutoff and caveats. Export artifacts refer to a report, not to mutable facts.
+- Corrections to evidence/facts/observations create new records or explicit supersession states. The database must not silently replace old values.
+- Store input arrays and report content as schema-validated JSON, versioned and hashed.
+- gross_return_pct and gross_profit_amount are strings; net return stays NULL in P0 until a separately approved costs/tax/slippage method and input policy exists.
+
 
 ## 5. SQLite integrity and indexes
 
@@ -130,6 +148,7 @@ Recommended indexes for the first migration:
 
 ```sql
 CREATE INDEX idx_cases_issue ON research_cases(issue_id);
+CREATE INDEX idx_identity_candidates_case_time ON identity_candidates(case_id, discovered_at);
 CREATE INDEX idx_evidence_case_time ON evidence_items(case_id, captured_at);
 CREATE INDEX idx_evidence_source ON evidence_items(source_id);
 CREATE INDEX idx_attempts_case_time ON acquisition_attempts(case_id, started_at);
@@ -138,7 +157,12 @@ CREATE INDEX idx_facts_case_indicator ON fact_records(case_id, indicator_code, r
 CREATE INDEX idx_observations_case_indicator_time ON market_observations(case_id, indicator_code, observed_at);
 CREATE INDEX idx_observations_segment_time ON market_observations(case_id, segment, observed_at);
 CREATE INDEX idx_runs_case_time ON analysis_runs(case_id, started_at);
+CREATE INDEX idx_results_run_key ON analysis_results(run_id, result_key);
 CREATE INDEX idx_findings_run_severity ON findings(run_id, severity, status);
+CREATE INDEX idx_scenario_definitions_case ON scenario_definitions(case_id, updated_at);
+CREATE INDEX idx_scenario_results_run ON scenario_results(run_id, scenario_id);
+CREATE INDEX idx_reports_case_time ON reports(case_id, generated_at);
+CREATE INDEX idx_report_artifacts_report ON report_artifacts(report_id, generated_at);
 CREATE INDEX idx_issue_identifiers_lookup ON issue_identifiers(identifier_type, identifier_value);
 ```
 
@@ -182,21 +206,21 @@ Exact API enum casing/status values are frozen in [Implementation Blueprint & Da
 
 ## 9. Decisions before migrations/API implementation
 
-1. **Data Contract:** exact request/response fields, error envelope and enum strings. Freeze this with the schema before implementing dependent endpoints.
-2. **ORM/migrations:** confirm the Python persistence library and migration mechanism during scaffold validation; this document does not claim the library is already configured or tested.
-3. **Identity constraints:** finalize uniqueness across source/identifier namespaces.
-4. **Indicator meanings and units:** use the Indicator Catalogue as authority; approve a P0 formula/rule register and representative fixtures.
-5. **File retention and backup:** settle upload size/backup behaviour before shipping, without weakening evidence provenance.
+1. **Schema migration:** validate the field definitions and constraints in this v0.2 proposal against docs/implementation-blueprint.md, then implement/test SQLAlchemy/Alembic migration 0001.
+2. **P0 formula/rule register:** use the Indicator Catalogue as authority; approve the formulas/rules and representative golden fixtures before enabling calculations.
+3. **Representative file tests:** verify PDF parsing boundaries and offline DOCX export; manual entry remains fully supported.
+4. **Source approval:** assess each provider's current rights/terms, coverage, timestamps, failure behaviour and repeatability before enabling it.
+5. **Backup/restore:** run recovery tests before relying on real data; do not weaken evidence provenance.
 
 Provider-specific connectors remain a separate feasibility gate. That uncertainty must not delay the provider-neutral acquisition-attempt model, time-stamped observations, manual fallback or core cross-signal analysis.
 
 ## 10. Implementation sequence
 
-1. Review this schema against app-flow and Technical Design.
-2. Freeze the first vertical-slice Data Contract and matching P0 formula/rule register.
-3. Implement migration v1 with foreign keys, indexes and automated schema tests.
-4. Implement case/identity, evidence/source registry, acquisition-attempt and observation persistence.
-5. Implement run snapshots, first cross-signal findings, conditional scenarios and report traceability.
+1. Verify this schema v0.2 against docs/implementation-blueprint.md and app-flow.
+2. Implement and inspect Alembic migration 0001 with foreign keys, indexes and enum checks.
+3. Test fresh database creation, invalid foreign keys/enums, restart persistence and migration safety.
+4. Implement identity, evidence, source registry, acquisition-attempt and observation persistence.
+5. Implement analysis results/snapshots, first cross-signal findings, separate scenario definitions/results, reports and report artifacts.
 6. Validate with representative fixtures and the source-feasibility benchmark. Any critical category lacking a free/permitted retrieval route needs an explicit product-owner decision before release.
 
 No source provider or retrieval success is implied by this schema. No application feature is implemented until code and tests demonstrate it.
@@ -204,31 +228,22 @@ No source provider or retrieval success is implied by this schema. No applicatio
 
 ---
 
-## 11. Required alignment to the frozen Implementation Blueprint
+## 11. Contract parity and migration gate
 
-The first schema tables above are a useful starting point, but the document was drafted before the exact P0 API contract. The [Implementation Blueprint](implementation-blueprint.md) is now authoritative for API object semantics and exact wire names. The migration target must include and align these details before Alembic migration 0001 is committed:
+The table definitions in Section 4 are the proposed persistence target aligned with docs/implementation-blueprint.md. The API contract is authoritative for wire names/values; this schema is authoritative for database tables/columns/constraints. Before migration 0001 is written, review them together and resolve concrete data-integrity or ORM constraints rather than arbitrary naming preferences.
 
-| Alignment item | Required persisted-model/schema decision |
-|---|---|
-| Identity candidates | Add an identity_candidates table or equivalent persisted model so discovery candidates can be reviewed/reopened without being mistaken for a confirmed issue. Link candidates to case, source and evidence; persist segment, issue dates/price band where known, source record ID, discovery time and candidate status. |
-| Case/identity fields | Map public caseStatus and identityStatus to explicit persisted columns/state rules. The case may exist with nullable issue_id while identity is unresolved. Confirmed issue records must be Mainboard only. |
-| Source state vs attempt state | Persist source access/approval state separately from connector enablement and individual acquisition_attempts. A disabled provider is not a successful/failed attempt. Preserve each real attempt and its category, timestamps, returned fields and failure reason. |
-| Observations and facts | Preserve decimal values as canonical decimal strings in TEXT, source/raw text, definition, segment/category, separate published/observed/retrieved/recorded timestamps, review rationale and supersession links. Do not infer unknown times. |
-| Analysis results | Add an analysis_results table keyed to analysis_runs and a stable result key/indicator code; persist status, decimal/text value, formula code/version, input fact/observation IDs, evidence links, reason and display-safe explanation. |
-| Scenario definition vs result | Use separate scenario_definitions and scenario_results. A scenario definition is a case-level assumption set; a scenario result belongs to a specific analysis run and snapshots the exact assumptions/results used. Do not store mutable assumptions only inside one result row. |
-| Report snapshot vs exported artifact | Use a reports table for immutable structured report content/snapshot/hash/template/cutoff and a separate report_artifacts table for HTML/DOCX files, hash, size, safe relative path and timestamps. A report exists even before an export is made. |
-| API/run status values | Persist the contract's run statuses (completed, partial, failed) and calculation result statuses (calculated, qualified, skipped, not_applicable, invalid) where applicable; never describe partial runs as fully completed. |
-| File metadata | Persist original filename for display, MIME/size/hash and a safe relative path, but do not expose paths in API payloads. Store original bytes outside SQLite. |
-| Snapshots and hashes | Snapshot records require schema/formula/rule/software versions, explicit cutoff, all selected source IDs/record IDs/review states/units/timestamps and a stable hash. Report snapshots need their own version/hash. |
-| IDs and API aliases | Use UUID text keys and snake_case database columns; public JSON camelCase is implemented by Pydantic aliases, not by renaming SQL columns. |
-| Enum/constraint parity | Align SQLite CHECK constraints/foreign keys with exact enums in the Blueprint; test all valid values and reject invalid values. Enable PRAGMA foreign_keys on every connection. |
+Required tests before the migration is accepted:
 
-### 11.1 Required order before migration 0001
+- [ ] Every table listed in Section 4 exists in the reviewed migration.
+- [ ] UUID primary and foreign keys use TEXT and are validated.
+- [ ] SQLite configuration enables PRAGMA foreign_keys = ON for every connection.
+- [ ] Invalid foreign keys, market segment, review status and run/calculation status values are rejected.
+- [ ] Unknown published/observed/retrieved timestamps remain NULL.
+- [ ] Decimal strings round-trip without float conversion.
+- [ ] Analysis snapshot and report snapshot hashes are stable for a canonical serialized payload.
+- [ ] A fact/observation correction creates history and does not mutate completed runs/reports.
+- [ ] Scenario definitions are distinct from saved per-run scenario results.
+- [ ] Report snapshots are distinct from rendered report artifacts.
+- [ ] Backup/restore retains referenced evidence/report files and validates manifest/checksums.
 
-1. Implement Pydantic models from docs/implementation-blueprint.md.
-2. Adjust this schema document and SQLAlchemy models to match the contract semantics above.
-3. Generate the initial Alembic migration from the reviewed models; inspect the generated migration manually.
-4. Test a fresh database, all foreign keys, representative records, restart persistence and invalid enum/reference rejection.
-5. Verify the actual OpenAPI-generated TypeScript types match the response/request models.
-
-Do not treat this addendum as proof that the migration or code already exists. It records the work required to make the persisted schema match the frozen API contract.
+These are uncompleted runtime gates. This document does not claim migration 0001, SQLAlchemy models or database tests already exist.
