@@ -23,7 +23,8 @@ Read the canonical documents in this order:
 6. [UI/UX Design Specification](docs/design.md)
 7. [Technical Design](docs/TECHNICAL_DESIGN.md)
 8. [Database Schema — proposed v0.1](docs/database-schema.md)
-9. [Agent rules](AGENTS.md)
+9. [Implementation Plan](implementation-plan.md)
+10. [Agent rules](AGENTS.md)
 
 The repository Markdown files are the source of truth. Update the existing file when a decision changes; use Git history rather than creating numbered copies or routine download files. Existing historical filenames are preserved for now, and every link must use their actual paths.
 
