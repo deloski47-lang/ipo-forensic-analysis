@@ -272,7 +272,7 @@ Test layers: backend domain/unit tests; persistence/migration/integration tests;
 
 ## 8. UI and design gates
 
-Follow [design.md](docs/design.md) and [app-flow.md](docs/app-flow.md). Implement the app shell and core pages incrementally: cases/home; create case and identity resolution; case overview; evidence inventory; facts/observations/review; analysis readiness; findings; scenarios; report preview/history; minimal local-data settings.
+Follow [design.md](design.md) and [app-flow.md](app-flow.md). Implement the app shell and core pages incrementally: cases/home; create case and identity resolution; case overview; evidence inventory; facts/observations/review; analysis readiness; findings; scenarios; report preview/history; minimal local-data settings.
 
 Every data-backed view needs loading, empty, validation, failure, partial, stale, conflict and not-applicable states as relevant. Status styling and animation must reflect real persisted outcomes, not optimistic UI assumptions. Keyboard access, visible focus, contrast, reduced-motion handling and responsive layouts are acceptance items, not polish to postpone indefinitely.
 
