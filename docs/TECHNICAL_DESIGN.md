@@ -116,7 +116,7 @@ This architecture makes the manual-first product practical to build. It does not
 
 - Broker/order execution.
 - Public hosting, public accounts, teams or multi-user features.
-- Mandatory live news, subscription, GMP, Trends, market-price or exchange APIs.
+- Any mandatory dependency on a particular paid, undocumented or unapproved live provider/API; paid data/AI subscriptions; full historical/intraday market-data backfill; or Google Trends. IPO-triggered acquisition orchestration and first cross-signal checks involving subscription/GMP are core; individual connectors must pass the free/permitted-use and data-quality gate.
 - Paid data or AI subscriptions.
 - AI-based extraction as a prerequisite.
 - Full implementation of every indicator in the catalogue.
@@ -160,7 +160,7 @@ Evidence lineage is not a report-only decoration. Store source identity, locator
 
 ### 4.4 Deterministic core; optional integrations at the edge
 
-Source or AI adapters are optional boundaries. They can propose observations or candidate facts, but cannot directly mutate trusted facts or silently change a saved run. Their failures stay contained.
+Individual source providers and AI are optional adapter boundaries, but **the source-acquisition orchestrator is core MVP functionality**. Approved source adapters can return observations/candidate facts; they cannot directly mutate trusted facts or silently change a saved run. Their failures stay contained and are recorded as acquisition outcomes.
 
 ### 4.5 Deliver one working vertical slice first
 
@@ -1124,15 +1124,17 @@ Source class alone does not guarantee quality. Assess the exact item, version, p
 
 ### 19.2 P0 source behaviour
 
-P0 requires **no live provider adapter**. It must support:
+P0 requires a **source-acquisition orchestrator**, but it does not assume a particular provider, undocumented endpoint or paid API. It must support:
+- Issue/source discovery after an IPO name is entered, followed by identity confirmation before observations are attached to the case.
+- Attempts through individually approved connectors for supported signal categories, prioritizing official QIB/NII/retail subscription data and named unofficial GMP publishers where feasible and permitted.
+- Persisted per-source attempt/result status, returned fields, source identity, observation/publication/retrieval timestamps, freshness, partial coverage and failure/blocked/unavailable reasons.
+- Source discovery/coverage summary in the case workspace and analysis preflight.
 - Local upload/registration of official offer PDFs and supporting material.
-- Manual issue, financial and offer-data entry.
-- Manual time-sensitive observations if the user has them.
-- Source metadata and locators.
-- Visible missing data, stale observations and conflicts.
-- Deterministic local calculations and report generation.
+- Manual issue, financial, offer and time-sensitive observation entry/import as complete fallbacks.
+- Visible missing data, stale observations, conflicts and signals skipped because prerequisites are unavailable.
+- Deterministic local calculations, interconnected cross-signal checks and report generation.
 
-The source audit did not establish a dependable, unrestricted, free historical pipeline. Do not design the core around one.
+The source audit has not established a universal, unrestricted, free automated pipeline. Do not design around a single provider or claim universal coverage; prove each connector separately. A critical missing free/permitted path must be explicitly resolved before release rather than silently treated as solved.
 
 ### 19.3 Adapter approval gate
 
