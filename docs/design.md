@@ -46,13 +46,17 @@ Use these qualities as the design filter:
 
 ---
 
-## 2. Hero section — explicitly reserved for the product owner
+## 2. Hero section — source fixed; component choice reserved for the product owner
 
-### Status: Not designed or implemented in this document
+### Source website: [21st.dev](https://21st.dev/) (referred to as “21.dev” by the product owner)
 
-The product owner has decided to source/copy the hero-section code and its desired transition behaviour from a finance website and provide that material later.
+**Decision recorded:** The hero section will be sourced from a selected hero component on 21st.dev. The product owner will choose the exact component and provide its component page/link or copied code. The exact component URL is not yet known and must not be guessed by Claude or another coding agent.
 
-Until then:
+The individual components in the 21st.dev registry can have their own dependencies and licence/usage terms. Before integrating the chosen component, inspect its actual source page, author, licence/usage conditions, required packages, assets and external requests. Use only a component that can be used within the **₹0 total project budget**. Do not purchase premium templates, paid copies, credits or subscriptions. Browsing/free copy limits may change; do not assume an unlimited free allowance.
+
+The hero must retain its selected source's intended look and motion as far as compatible with our product constraints, then be integrated into our design tokens and application structure without copying unrelated site-wide styles or scripts. The rest of the application must not be redesigned to imitate the source website.
+
+Until the owner supplies the exact component:
 
 - Do not invent hero copy, headline, illustration, dashboard preview, CTA placement, background, height, responsive layout, scroll behaviour or animation.
 - Do not decide whether the supplied hero belongs to a separate intro/landing view, the case-list screen, or another location until the actual code/context is provided.
@@ -64,7 +68,7 @@ Until then:
 - Any external assets/font requests must have a fallback; the local-first app's core workflow cannot depend on the hero's remote assets loading.
 - Do not alter the global app-shell navigation or page-transition contract to imitate the source website if that breaks the established application flow.
 
-**Integration gate:** once the product owner supplies the copied hero code and identifies its intended screen, review it in isolation, list its dependencies, adapt only the parts necessary to integrate it, test the motion/accessibility behaviour, and then record the final hero-specific decisions here. Until then, this section remains reserved.
+**Integration gate:** once the product owner supplies the exact 21st.dev component URL or code and identifies its intended screen, review it in isolation, record the author/source/licence, list its dependencies/assets/network requests, check compatibility with React and the existing motion package, adapt only what is necessary, and test responsiveness, accessibility, reduced motion and performance. Record the actual component URL and resulting dependency decision here in place. Until then, do not select or implement the hero on the owner's behalf.
 
 ---
 
@@ -98,7 +102,9 @@ Do not substitute a blue fintech palette, dark dashboard theme or another green 
 
 ### 3.2 Colour use and contrast
 
-The dark text on the near-white background has approximately 18.37:1 contrast. Dark text on the primary, secondary and accent colour surfaces also exceeds 4.5:1. However, primary (#8ea06d), secondary (#b3ccb1) and accent (#87b18c) do not achieve 4.5:1 as text directly on the near-white background.
+**The five palette values are fixed exactly as supplied by the product owner. Do not change them in the name of accessibility.** Preserve the tokens, and make accessible component choices around them.
+
+The dark text on the near-white background has approximately 18.37:1 contrast. Dark text on primary, secondary and accent filled surfaces also exceeds 4.5:1. However, primary (#8ea06d), secondary (#b3ccb1) and accent (#87b18c) do not achieve 4.5:1 as text directly on the near-white background.
 
 Therefore:
 
@@ -427,6 +433,8 @@ Do not use:
 **Recommended baseline:** CSS transitions for simple hover/focus/active states, plus **Motion for React** (npm package: motion; imports from motion/react) for route/content presence, shared layout and complex state changes where CSS alone would be awkward.
 
 This is a recommended dependency, not something already installed or tested. During the scaffold, confirm its React compatibility, pin a compatible version in the lockfile, and keep the imported feature set small. Use only the free/open-source `motion` package under its MIT license. Do not use Motion+, `motion-plus`, Motion UI from the private registry, premium APIs, paid examples or paid editor/audit features. Do not add GSAP or a second animation library on top unless a concrete requirement demonstrates a need.
+
+The hero selected from 21st.dev may itself import `framer-motion`, `motion`, or another library. Do not blindly install a second motion system. Inspect the actual component first: prefer adapting it to the existing open-source motion dependency when this preserves the chosen effect and is technically sound. If a separate dependency is genuinely required to preserve the selected hero behaviour, verify its cost/licence/compatibility, explain the trade-off and document the decision before adding it. No paid Motion+ feature or other paid dependency may be introduced.
 
 Native CSS View Transitions may be evaluated later as progressive enhancement, but do not build two competing route-transition systems or animate the same component with both Motion and View Transitions. The initial MVP should have one predictable motion implementation that can be disabled/reduced and tested.
 
@@ -878,7 +886,9 @@ These are intentionally left open rather than invented:
 Any agent building the UI must:
 
 1. Read AGENTS.md, app-flow.md, the PRD and Technical Design before implementing UI.
-2. Treat this file as the design baseline for non-hero screens and interactions.
+2. In Claude Code, **use the Anthropic-verified Frontend Design UI/UX skill/plugin** before planning or implementing frontend UI. Official reference/installation page: https://claude.com/plugins/frontend-design. Check that it is available and invoke/apply it to the task; use its plan-and-critique workflow for hierarchy, layout, interaction and motion. If it is unavailable, do not claim it was used—tell the product owner and request that it be installed/enabled before frontend implementation proceeds.
+3. The skill is a design assistant, not the authority for this project's requirements: it must follow this document, the app flow and the approved product constraints. It must not override the exact palette/type decisions, invent the hero, add paid dependencies, or expand scope.
+4. Treat this file as the design baseline for non-hero screens and interactions.
 3. Preserve the exact owner-provided palette and typography unless the owner changes them.
 4. Leave the hero entirely untouched until its source code and intended location are supplied.
 5. Never import a complete source website stylesheet globally to obtain one hero section.
@@ -899,6 +909,8 @@ Any agent building the UI must:
 
 Official documentation used to inform the recommended motion/accessibility implementation. Recheck current details during implementation:
 
+- 21st.dev component registry (hero source; exact component is to be selected by the product owner): https://21st.dev/
+- Anthropic-verified Frontend Design plugin/skill for Claude Code: https://claude.com/plugins/frontend-design
 - Motion for React installation and React/Vite setup: https://motion.dev/docs/react-installation
 - Motion package source and MIT license (use the open-source package only; do not use paid Motion+ features): https://github.com/motiondivision/motion
 - Motion for React layout animations and shared layout transitions: https://motion.dev/docs/react-layout-animations
@@ -915,6 +927,8 @@ These references support implementation choices; they do not mean the animation 
 
 Use the specified palette and Afacad Flux typography as the shared design foundation. Build a light, precise, premium research workspace with readable data tables, evidence-first status treatments and consistent, tasteful non-hero motion.
 
-**Leave the hero section for the product owner.** Once the owner supplies its source, integrate it as an isolated part of the app rather than allowing copied styles or animation scripts to destabilize the entire UI.
+**The hero source is 21st.dev; the exact component remains for the product owner to choose.** Once its URL/code is supplied, review its licence/dependencies and integrate it as an isolated component rather than allowing copied styles or animation scripts to destabilize the entire UI.
+
+**Claude Code UI/UX implementation rule:** use the Anthropic-verified Frontend Design skill/plugin for frontend planning, implementation and critique. Do not claim the skill ran unless it was actually available and applied.
 
 The next design step is to review this specification and then produce the screen-level wireframes or visual references for the non-hero workspace. Do not start the Data Contract solely because the design document is complete; follow the established order and finalize contracts before implementing dependent API flows.
