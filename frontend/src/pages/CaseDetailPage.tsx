@@ -134,8 +134,8 @@ export default function CaseDetailPage() {
             <p className="muted">This records your manual confirmation; it does not independently verify the document. Missing dates and financial terms stay unknown.</p>
             <button className="button button-primary create-button" disabled={busy || evidence.length === 0 || identityEvidenceIds.length === 0}>{busy ? "Confirming…" : "Confirm Mainboard identity"}</button>
           </form>
-        </>
-        <div className="detail-status-row"><span className="case-status status-identity_pending">{researchCase.caseStatus.replaceAll("_", " ")}</span><span className="identity-status">{researchCase.identityStatus.replaceAll("_", " ")}</span></div>
+        </>}
+        <div className="detail-status-row"><span className={"case-status status-" + researchCase.caseStatus}>{researchCase.caseStatus.replaceAll("_", " ")}</span><span className="identity-status">{researchCase.identityStatus.replaceAll("_", " ")}</span></div>
       </div>
       <div className="panel">
         <p className="eyebrow">ADD EVIDENCE</p><h2>Register a source or upload a PDF</h2>
