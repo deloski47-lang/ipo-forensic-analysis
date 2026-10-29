@@ -53,6 +53,21 @@ app.add_middleware(
 app.include_router(api_router, prefix="/api/v1")
 
 
+@app.exception_handler(HTTPException)
+async def http_error_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    request_id = str(uuid4())
+    code = "NOT_FOUND" if exc.status_code == 404 else "INVALID_REQUEST"
+    message = exc.detail if isinstance(exc.detail, str) else "The request could not be completed."
+    return JSONResponse(
+        status_code=exc.status_code,
+        headers=exc.headers,
+        content={
+            "error": {"code": code, "message": message, "details": [], "requestId": request_id},
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        }
+    )
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     request_id = str(uuid4())
