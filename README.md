@@ -41,7 +41,7 @@ The working scaffold is being built on branch build/phase-0-scaffold. It is not 
 ### Prerequisites
 
 - Python 3.11 or newer.
-- Node.js 22.12 or newer (current Vite requires Node.js 20.19+ or 22.12+).
+- Node.js 22.22 or newer (the chosen React Router v8 release requires Node.js 22.22+; the current Vite release also has a minimum Node.js version).
 - Git.
 
 ### Start the backend (Windows PowerShell)
