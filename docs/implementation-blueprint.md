@@ -661,6 +661,7 @@ All paths are relative to /api/v1. {caseId}, {evidenceId}, {factId}, {observatio
 | POST /cases | CreateCaseRequest | 201 CaseDetail | Create case before identity resolution |
 | GET /cases/{caseId} | None | CaseDetail | Reopen case |
 | PATCH /cases/{caseId} | UpdateCaseRequest | CaseDetail | Update title only |
+| POST /cases/{caseId}/archive | None | CaseDetail | Archive a case without deleting its records/history |
 | POST /cases/{caseId}/identity/discover | IdentityDiscoveryRequest | IdentityDiscoveryResponse | Discover through actually enabled/approved mechanisms and report unavailable/not-enabled accurately |
 | POST /cases/{caseId}/identity/confirm | ConfirmIdentityRequest | CaseDetail | Confirm evidence-backed Mainboard identity |
 | GET /cases/{caseId}/acquisition/attempts | Optional signalCategory | AcquisitionAttemptListResponse | View actual persisted attempts |
@@ -756,6 +757,10 @@ IssueIdentifier:
 CaseListResponse:
 - items: CaseSummary[].
 - total: integer >= 0.
+
+GET /cases optional query status is CaseStatus; when omitted, return all cases in lastActivityAt descending order. Do not add offset/cursor pagination in P0. GET evidence optional evidenceKind is EvidenceKind. GET facts reviewStatus is FactReviewStatus. GET observations reviewStatus is ObservationReviewStatus; signalCategory/indicatorCode filters are exact enum/catalogue values. Unknown query values return VALIDATION_ERROR, not an empty list.
+
+POST /cases/{caseId}/archive returns the updated CaseDetail. It does not delete data or files. A case may be archived in any identity state. All archived cases remain readable/exportable and are included by GET /cases unless filtered. No destructive case deletion exists in P0.
 
 CaseSummary fields: caseId, enteredName, title, caseStatus, identityStatus, issueDisplayName: string | null, lastActivityAt, latestAnalysisRunId: UUID string | null, latestReportId: UUID string | null, warningCount: integer. Do not invent issue metadata.
 
@@ -1175,6 +1180,42 @@ RestoreResponse:
 - message: string.
 
 Never extract archive paths outside the configured data directory. Restore cannot accept arbitrary server paths. Test in a disposable directory first.
+
+---
+
+### 9.12 Fully specified shared list and summary response models
+
+The following wrappers are also used by the route inventory and must be implemented with these exact fields. Do not return a bare array where an envelope is declared.
+
+- EvidenceListResponse: items: EvidenceItem[]; total: integer >= 0.
+- FactListResponse: items: FactRecord[]; total: integer >= 0.
+- ObservationListResponse: items: MarketObservation[]; total: integer >= 0.
+- AcquisitionAttemptListResponse: items: AcquisitionAttemptSummary[]; total: integer >= 0.
+- AnalysisRunListResponse: items: AnalysisRunSummary[]; total: integer >= 0.
+- ScenarioListResponse: items: ScenarioDefinition[]; total: integer >= 0.
+- ScenarioResultListResponse: items: ScenarioResult[]; total: integer >= 0.
+- ReportListResponse: items: ReportSummary[]; total: integer >= 0.
+
+AnalysisRunSummary fields: analysisRunId, caseId (UUID strings), runStatus (AnalysisRunStatus), informationCutoffAt, startedAt (RFC3339 timestamps), finishedAt (RFC3339 timestamp | null), inputSnapshotHash (64 lowercase hex characters).
+
+ReportSummary fields: reportId, caseId, analysisRunId (UUID strings), generatedAt (RFC3339 timestamp), templateVersion (string), reportSnapshotHash (64 lowercase hex characters), title (string), issueDisplayName (string), informationCutoffAt (RFC3339 timestamp), warningCount (integer >= 0), exportArtifacts (ReportArtifact[]). Include only properties actually saved in the report metadata; never synthesize a report from the current case.
+
+Additional wire status types used above:
+
+| Type | Allowed values |
+|---|---|
+| HealthStatus | ok, degraded |
+| DiscoveryStatus | found, partial, not_enabled, unavailable, failed |
+| ExtractorStatus | completed, partial, failed |
+| RestoreStatus | completed, failed |
+
+All list wrappers return total as the count of returned items in P0 because no pagination is implemented. If pagination is later added, it is a deliberate contract change with new fields and tests.
+
+### 9.13 Download and error details
+
+Binary download endpoints return the appropriate Content-Type, Content-Disposition with a safe display filename, and Content-Length when known. Evidence PDF uses application/pdf; ZIP backup uses application/zip; DOCX uses the Open XML Word document MIME type; HTML export uses text/html; no binary endpoint reveals its local storage path. Reject a download request if the identifier is not under the supplied parent resource.
+
+Validation errors use error.details entries with field, issueCode and message. field may be null for a request-level error. Readiness error detail fields use code, severity, message, affectedIndicatorCodes, affectedSignalCategories, evidenceIds and nextAction as defined for ReadinessIssue. Do not place arbitrary nested Python exceptions into JSON.
 
 ---
 
