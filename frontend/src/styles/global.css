@@ -175,3 +175,9 @@ h2 { font-size: 23px; line-height: 1.2; letter-spacing: -.035em; margin-bottom: 
 .identity-evidence-option small { display: block; color: var(--text-muted); margin-top: 3px; }
 .confirmed-identity { margin-top: 20px; padding: 14px; border-radius: var(--radius-sm); background: #edf5eb; }
 .confirmed-identity h3 { margin: 0 0 6px; font-size: 16px; }
+
+.readiness-panel { margin-top: 22px; }
+.readiness-issue { padding: 12px; border-radius: var(--radius-sm); margin: 9px 0; font-size: 12px; line-height: 1.5; }
+.readiness-issue p { margin: 5px 0 0; }
+.readiness-blocker { background: #fff1ed; border: 1px solid #f1c7bc; }
+.readiness-warning { background: #fff7e8; border: 1px solid #ecd8ac; }
