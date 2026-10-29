@@ -1437,3 +1437,239 @@ Record unresolved decisions in the relevant existing canonical document, then re
 - **implementation-plan.md:** build order and measurable delivery gates.
 
 The objective is a coherent, testable end-to-end product—not a stack of disconnected documents or screens.
+
+
+---
+
+# Addendum A — Consolidated end-to-end website journey and integration handoff
+
+> This addendum expands the user journey described above into one continuous, easy-to-follow path. It is additive: the preceding sections remain unchanged. This is still an **application-flow specification**, not the final Data Contract. Names below such as `case_id` and `evidence_id` are conceptual identifiers to help frontend/backend planning; their exact types, property names, nullability and wire representations must be agreed in the Data Contract.
+
+## A1. The full journey, from opening the website to seeing results
+
+### Step 1 — Home / My Research Cases
+
+The user opens the local application and sees **Home / Cases**. This is the starting screen, not a market dashboard. It lists saved IPO research cases and provides a clear **New IPO Case** action. Each saved item should show the best-known issue name, identity state, last activity, latest analysis/report state and outstanding warnings.
+
+If the user is returning, they open an existing case and continue where they left off. Opening a case restores saved state; it does not re-fetch data or re-run analysis automatically. If the local database cannot be read, show a storage error—not a falsely empty list.
+
+### Step 2 — Enter the IPO name
+
+The user selects **New IPO Case** and enters the IPO/issuer name, plus any optional identifier or known issue detail that helps distinguish it. A ticker is not mandatory. At this point the user has supplied a search phrase, **not a confirmed issue identity**.
+
+The application searches/discovers candidates only through a source or local workflow actually available and allowed by the source audit. If no compliant discovery connector is enabled, say so and allow the user to continue with local/manual identification. Do not invent search results or imply that the internet was checked when it was not.
+
+### Step 3 — Confirm the exact issue before full analysis
+
+Show the best available candidate details side by side so the user can verify that the correct issue was selected. Relevant details include:
+
+- Issuer/legal name and issue/display name.
+- Mainboard segment and the evidence supporting that classification.
+- Issue/open/close dates when known.
+- Price band and issue identifiers when known.
+- Source name, source record identifier/link and the time information available from that source.
+- Any conflicting candidate or identity details.
+
+If multiple issues could match, leave identity **ambiguous/unresolved** and ask the user to choose or supply supporting evidence. Do not silently select the first string match. If the IPO is identified as an SME issue, explain that SME IPOs are out of scope and stop the supported analysis flow. If segment is unknown, do not guess Mainboard.
+
+Full analysis is blocked while the issue identity is materially uncertain. Supporting evidence can still be registered while identity is unresolved, provided it is clearly marked as not yet confidently linked to the issue.
+
+### Step 4 — Create/save the research case
+
+After the user begins the case, persist a local research case with a stable conceptual `case_id`. Link it to a confirmed `issue_id` only after the issue has been resolved adequately. Preserve the original user-entered search text separately from the final confirmed issue identity.
+
+The case becomes the home for evidence, facts/observations, acquisition attempts, analysis runs, findings, scenarios and reports. These are parts of the same case—not separate projects duplicated for each feature. The user can close the application and return later.
+
+A successful save must be confirmed by the persistence layer before the UI says **Saved**. If saving fails, preserve the form where safe, show the specific error and allow retry. Do not accidentally create two cases if the first save succeeded but its response was lost.
+
+### Step 5 — Try source acquisition and show exactly what happened
+
+After identity is confirmed, the application may run the acquisition orchestrator for connector adapters that have actually been approved and enabled. It should attempt only the categories each adapter is known and permitted to supply. The screen should show, per source/category, whether it was attempted, the real outcome, returned fields, source link/identifier, known timestamps, freshness and limitations.
+
+Use clear user-visible states such as **Found**, **Partial**, **Unavailable**, **Not enabled**, **Not attempted**, **Blocked by policy/terms**, **Failed**, **Stale** and **Conflicting**. These labels explain actual outcomes; they are not interchangeable. An adapter that is not approved must not be shown as having fetched data. An API/network error is not a zero value and is not proof that the source contains no data.
+
+Acquisition is helpful but is not a prerequisite for creating or maintaining a case. The user's work must remain possible without internet, provider credentials, paid APIs or AI services. At the current audit state, **no external source connector is production-approved**; see Addendum C.
+
+### Step 6 — Upload documents (after case creation, from Evidence)
+
+**The user does not have to upload a file just to search for or identify an IPO.** Once the local case exists, the user can open **Evidence** and add documents at any point. The recommended first document is the official offer document/RHP/prospectus. Addenda, annual reports, exchange/company disclosures and other relevant evidence can be added as available.
+
+For every uploaded file, the user chooses a local file and can optionally add its source URL, document/published date, description and document type. The application validates the file type and size against the supported implementation, saves the original locally, and records its metadata/checksum and any available page/locator information. It must not imply that an upload succeeded until the file and its metadata were persisted.
+
+A local PDF parser may create **extraction candidates**, ideally with the page/section locator and enough context for review. Extracted text is not automatically an accepted fact. The user reviews each candidate, corrects it where needed, and explicitly accepts or rejects it under the implemented review flow. If parsing is inaccurate, unsupported or fails, preserve the original file and allow manual entry. A document upload should not be lost because extraction failed.
+
+The user can upload documents later, in stages. Do not make every possible document mandatory before the user can proceed. The application must not send local files to ChatGPT or another external service implicitly.
+
+### Step 7 — Review facts and enter missing observations manually
+
+The **Facts & Review** area brings together accepted facts, user-entered observations, unreviewed extraction candidates, conflicting alternatives, stale values and missing required inputs.
+
+When a source doesn't provide a needed fact, the user can enter it manually if that observation type is supported. For example, manually recorded subscription values or GMP observations should retain, as known:
+
+- The publisher/source, source URL or evidence reference.
+- The value as written by the source and its parsed/numeric representation.
+- Category and definition (for example, QIB, NII or retail, or what a GMP figure refers to).
+- Unit, currency and scale.
+- Reporting/financial period when applicable.
+- Source publication time/date, observation/as-of time and retrieval/entry time as separate fields when known.
+- The user's review/verification state and a note where useful.
+
+Unknown timestamps stay unknown/null; do not fill them from the time the app happened to fetch the data. Do not assume a feed-generation time is the observation time of every item in the feed. The app must preserve raw source meaning and should not combine data that represents different periods or definitions without an explicit approved rule.
+
+Missing means missing—not zero. Conflicting observations remain visible with their sources. Do not silently overwrite, average, or choose a preferred value without the documented rule/user review. Corrections and superseded values should remain auditable where the model supports history.
+
+### Step 8 — Analysis Readiness / Preflight
+
+Before execution, the user opens **Analysis & Findings** and sees a readiness/preflight view. It should tell the user what is ready, what is missing, what conflicts, what is stale and exactly which calculations will be affected.
+
+The readiness view should include:
+
+- Issue identity and Mainboard status.
+- Documents and evidence that have been registered.
+- Facts/observations and candidates awaiting review.
+- Coverage/status of source attempts for relevant categories.
+- Financial and offer facts needed by the currently enabled formulas.
+- QIB/NII/retail subscription and GMP coverage, if relevant to enabled rules.
+- Conflicting, stale, invalid, unverified and missing inputs.
+- The analysis cutoff/as-of policy that will apply to the run.
+- The reason each blocked or skipped formula/rule cannot execute.
+
+Identity ambiguity blocks full issue-specific analysis. Missing data for one formula should normally block or qualify **that formula**, not automatically prevent every unrelated valid calculation. A partial, explicitly qualified run/report may be allowed where the agreed readiness policy says it is useful. If the available evidence is too thin to produce a useful analysis, explain the needed inputs and do not manufacture a result.
+
+### Step 9 — Run deterministic analysis
+
+When the user selects **Run Analysis**, the backend validates the input/evidence snapshot and executes only formulas and rules that are in the approved register. Core arithmetic is deterministic application code, not a mandatory AI answer. The run records which facts/evidence and formula/rule versions it used, the applicable cutoff, and the reason for any blocked/skipped check.
+
+The planned analysis connects the applicable signals rather than displaying them as unrelated numbers. Depending on what is available and approved, relationships may include financial/business quality, offer and valuation, issue size/free float, QIB/NII/retail demand, unofficial GMP, and relevant market/company-event context. Use the Indicator Catalogue and approved formula/rule register to define the actual tests. If a required input is missing, stale, conflicting or not time-aligned, qualify or skip that relationship and say why.
+
+A signal co-occurrence is not proof of causation, fraud or misconduct. Findings should describe the observed relationship, why it triggered, supporting and contradictory/context evidence, limitations and reasonable alternative explanations. Do not turn a single sample or unofficial signal into a guaranteed listing outcome.
+
+Every new run creates a new immutable `analysis_run_id` and saved input/evidence snapshot. A later correction or added file may affect a new run, but it must not rewrite a previously saved run or report.
+
+### Step 10 — Review results and scenarios
+
+After the run is saved, open its results and clearly show which run/cutoff the user is looking at. The results page should contain these logical areas:
+
+1. **Research summary:** issue identity, cutoff/as-of, evidence coverage and important qualifications.
+2. **Business and financial quality:** only the approved, supported financial/business indicators and the sources/periods used.
+3. **Offer, valuation and demand:** offer terms and enabled valuation/demand measures, including separate QIB/NII/retail categories where supported.
+4. **Cross-signal findings:** the relationship tested, why it triggered, relevant evidence on both sides, and caveats/alternative explanations.
+5. **Scenario calculator:** user-defined inputs and transparent arithmetic.
+6. **Evidence, source status and limitations:** missing fields, stale/conflicting values, failed/unavailable sources and provenance.
+
+Material claims must link back to the facts, source documents, page locators or observations that support them. If a value is unavailable, display it as unavailable or skipped with a reason; don't fill the space with an invented number.
+
+The user may enter a listing/exit-price scenario. Label inputs as **assumptions**, not observations or predictions. Gross-return arithmetic can be shown when its prerequisites are met. Do not label a result as net return while fee/tax/slippage inputs and the approved net-return policy are absent. Allotment probability is a separate question from return conditional on receiving an allotment. Do not present guaranteed profit, a universal buy/avoid verdict or a prediction unsupported by validated methodology.
+
+### Step 11 — Preview/export report and return later
+
+The user generates a report from a saved run, previews it, and exports the formats actually implemented and tested. The preferred initial offline export path is DOCX after a representative-file test; HTML preview may also be available. Do not promise PDF export until a free, offline-compatible implementation has been verified.
+
+A report must preserve evidence provenance, source-acquisition status, the run cutoff, data timestamps/unknown timestamps, missing inputs, conflicts, assumptions, skipped/blocked checks and limitations. Exporting a report must not silently re-run the analysis. The same saved report can be reopened later and should represent the same run snapshot.
+
+If the user adds evidence or corrects a fact, show that the current case has changed since the previous run. The user can check readiness and run again; the new run/report is versioned separately and older reports remain unchanged.
+
+## A2. Where each user action belongs
+
+| User question/action | Where it happens | What must be saved or shown |
+|---|---|---|
+| “I want to analyse an IPO” | Home → New IPO Case | Create a case; no file upload required yet. |
+| “Which IPO exactly?” | Issue discovery/identity confirmation | Candidate evidence and explicit confirmed/unresolved state. |
+| “What did online sources return?” | Case Overview / Acquisition status | Real attempt outcomes, fields, times, freshness and limitations per source/category. |
+| “I have the prospectus” | Case Workspace → Evidence | Preserve local original and metadata; extraction output remains a candidate until reviewed. |
+| “This source is missing a value” | Facts & Review | Manual observation with source/meaning/unit/time where known and review state. |
+| “Can I analyse this now?” | Analysis & Findings → Readiness | Prerequisites, conflicts, freshness, cutoff and formula-specific blockers. |
+| “What does it tell me?” | Saved analysis run → Results/Findings | Deterministic calculations, qualified findings and traceable evidence. |
+| “What if listing price is ₹X?” | Scenarios | Clearly labeled assumptions and supported gross-return calculation. |
+| “I need a file/shareable report” | Reports & History | Preview/export from the selected immutable saved run. |
+| “I changed a value; what now?” | Facts/Evidence → Readiness → New Analysis Run | New snapshot/run; older runs and reports remain unchanged. |
+| “Something failed” | The same screen that initiated it | Specific failure/recovery action; preserve already persisted work and never claim a failed save succeeded. |
+
+## A3. Data lifecycle: candidate → reviewed evidence → analysis → report
+
+Use this sequence as the mental model shared by frontend and backend:
+
+1. **Candidate discovery:** a name, a source row or extracted text suggests an issue/fact but is not yet necessarily accepted.
+2. **Identity confirmation:** the user confirms the exact Mainboard issue with sufficient supporting details.
+3. **Evidence registration:** save source document/URL/source response metadata and retain its provenance.
+4. **Fact/observation review:** parse or enter the value, preserve its definition/period/unit/time, and record whether it is accepted, unverified, conflicting, stale, rejected or superseded.
+5. **Readiness evaluation:** determine which approved formulas/rules have the necessary valid, time-appropriate inputs.
+6. **Immutable analysis run:** evaluate only enabled rules and record its evidence/input/version snapshot.
+7. **Finding review and scenario calculation:** show why each finding exists and keep scenario assumptions separate from observations.
+8. **Saved report/export:** render from the selected saved run and preserve provenance, unknowns and limitations.
+9. **Re-run after changes:** create a new run/report; do not mutate history.
+
+If parsing, source retrieval, or one calculation fails, the application should preserve valid work from other stages and show exactly where the pipeline stopped. The user should not need to start the entire case again.
+
+## A4. Integration identifiers and responsibilities (intended, not final API names)
+
+These identifiers are conceptual anchors for the first frontend/backend vertical slice. Final API shapes, database fields and status enums are deliberately deferred to the Data Contract and schema alignment.
+
+| Conceptual identifier/object | Created or updated when | Purpose |
+|---|---|---|
+| `case_id` | Research case is saved | Stable identifier for the user's case workspace. |
+| `issue_id` | Issue identity is confirmed/linked | Stable issue reference distinct from user-entered search text. |
+| `identity_status` | Candidate matching/review changes | Expresses confirmed, unresolved/ambiguous, out-of-scope or other agreed identity states. |
+| `acquisition_attempt_id` | A source/category attempt starts or completes | Audits what was tried, when, and its actual outcome. |
+| `evidence_id` | File, URL, source capture or supporting evidence is registered | Connects facts/findings/report claims to their evidence. |
+| Fact/observation identifier | A value is entered/imported/extracted and recorded | Tracks one sourced statement with its meaning, unit, period, timestamps and review state. Exact property names remain for the Data Contract. |
+| `analysis_run_id` | Analysis snapshot is successfully saved | Selects an immutable run and its cutoff, input snapshot and formula/rule versions. |
+| `finding_id` | A rule emits a finding for a run | Connects the finding to trigger logic and supporting/contradicting evidence. |
+| `report_artifact_id` | A report model or export is successfully saved | Identifies the report linked to a particular saved run. |
+
+Frontend responsibility: gather user intent, show explicit source/review/readiness states, validate basic form input for usability and navigate through stable identifiers. Backend responsibility: enforce validation and scope, manage acquisition, persist provenance and snapshots, run deterministic formulas/rules, and return explicit statuses/errors. A disabled button is not a substitute for backend validation, and a success toast is not proof of persistence.
+
+Do not invent endpoint names, API payload casing or exact database properties from this table. Define them in the Data Contract after the interaction flow is accepted.
+
+## A5. Source-feasibility snapshot relevant to the flow (29 October 2026)
+
+These are bounded smoke-test observations to inform honest UI states. They are **not** production approval, a guarantee of continued access or proof of repeatability.
+
+| Candidate source | What was observed in the recorded tests | How the app-flow should treat it now |
+|---|---|---|
+| IPOS Markets | Combined script v0.2 returned HTTP 200 and matched all 10/10 target issues; all 10 matched detail records included QIB/NII/RII fields and an `as_of` value. One record (Bombay Coated) had `basis: "bids_only"` and `overall_times: null`; do not infer an overall-times value. | Priority subscription-data candidate, still unapproved. Any future adapter must preserve basis, null values, definition and observed/source time and pass repeatability/source-policy gates before being enabled. |
+| GMP Today | The v0.2 test returned HTTP 200 and 3 items from 17 tracked; those per-item records had `updated_at: null`. The feed had `generated_at: 2026-10-29T10:00:40+05:30`. The observed medians differed between runs (BLS Polymers ₹48→₹51, Maxwell Engineering Solutions ₹33→₹43, Ajwa Projects ₹36→₹35). | Limited-sample GMP candidate, still unapproved. Do not treat the feed generation time as an item observation time, or claim the sample establishes comprehensive issue coverage. Preserve the source definition and unknown item timestamps. |
+| Xflot directory | v0.2 directory test returned HTTP 200, 182 IPO records, 110 classified Mainboard. | Discovery candidate only; not a production-approved connector. |
+| Xflot issue detail | The v0.1 BLS Polymers detail test returned Mainboard/OPEN, price band ₹142–₹150, last GMP ₹51, one GMP source and 11 history points; subscription fields were absent (`lastSubX: null`, `subs: []`). The combined v0.2 test did not re-test the individual detail endpoint. | Conditional issue/GMP detail candidate only; current evidence does not support using it for QIB/NII/retail subscription. Honour the documented 65-second minimum poll safeguard and required attribution/disclaimer. |
+
+The v0.2 combined run is one run, not a strict same-version repeatability test. Do not invent a claim that repeatability has been proven. The audit permits work on the manual-first architecture and vertical slice to proceed without repeated smoke tests, but provider-specific enablement remains gated on source access/terms, repeatability and field-level validation. **No connector is production-approved at this snapshot.** Do not scrape NSE absent written permission. These external-source facts must stay aligned with the [Data Source & Feasibility Audit](IPO_Data_Source_and_Feasibility_Audit_v1.0.md); if that audit changes, update this snapshot rather than treating it as timeless.
+
+## A6. Required error and recovery behaviour across the complete path
+
+- **Discovery/source offline or blocked:** clearly mark not attempted, unavailable or policy-blocked as appropriate. Continue manual-first workflows.
+- **Source response is partial or malformed:** preserve valid returned evidence as permitted, mark the source attempt partial/failed and reject invalid fields; never convert absent fields to zero.
+- **Issue identity uncertain:** allow evidence gathering but block full issue-specific analysis until confirmed.
+- **Unsupported/invalid file:** explain the file constraint, do not create a false successful evidence record, and keep the case open.
+- **PDF extraction fails:** preserve the file and allow manual fact entry.
+- **Save/database/disk failure:** never display “Saved”; retain user input where safe, give recovery guidance and permit retry/reconciliation.
+- **Source disagreement:** show the competing values and provenance; require the defined resolution workflow or qualify the affected check.
+- **Stale or unknown timestamps:** show unknown/stale status. Do not substitute retrieval time or current time for an unknown observation time.
+- **One formula cannot run:** show its exact missing/invalid/conflicting prerequisites; unrelated eligible formulas may still complete.
+- **A finding cannot be substantiated:** skip or qualify it rather than writing a definitive claim.
+- **Unknown case/run/report ID:** show not-found and return navigation; never select another case because its name looks similar.
+- **Export failure:** keep the saved run/report model, explain the failed export and allow retry. Export does not implicitly rerun analysis.
+- **Evidence file later missing or corrupt:** show the integrity problem and a recovery/restore path; do not silently omit the supporting source from a report.
+- **Backup/restore:** provide clear local backup/restore guidance and validate a restore before relying on backups for valuable research data.
+
+## A7. End-to-end acceptance checklist for the first usable vertical slice
+
+A vertical slice is usable only when the user can complete the following sequence without paid services, mandatory AI or a live connector:
+
+- [ ] Start the local app and see a truthful Home/Cases state.
+- [ ] Create a research case from an IPO name and distinguish that name from confirmed identity.
+- [ ] Confirm a Mainboard issue, or see a clear ambiguity/SME out-of-scope block.
+- [ ] Reopen the saved case after refresh/restart.
+- [ ] Register a local offer PDF and retain its original even if extraction is unavailable or fails.
+- [ ] Enter at least the required supported facts manually with their sources/units/periods and review status.
+- [ ] See missing, stale, conflicting, invalid and unknown-time values distinctly from zero or verified values.
+- [ ] See source attempts/coverage accurately, including disabled/unapproved adapters, without simulated-success claims.
+- [ ] Run at least one approved deterministic calculation from valid prerequisites and see why any other enabled check was skipped.
+- [ ] Inspect a finding and trace its supporting input/evidence; see limitations and alternative explanations where relevant.
+- [ ] Enter a user-defined scenario and get only the arithmetic supported by its known assumptions.
+- [ ] Save and preview a report that preserves the run cutoff, provenance, missingness, conflicts and caveats.
+- [ ] Change evidence/facts, rerun, and confirm the previous run/report is unchanged.
+- [ ] Simulate a failed save/source/file operation and verify that the UI reports the real failure and offers recovery.
+- [ ] Confirm there is no required account, cloud hosting, paid API, external AI, broker/order execution or prohibited NSE scraping.
+
+The first implementation should exercise this complete, minimal path before expanding provider coverage or adding advanced automation.
+
