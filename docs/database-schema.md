@@ -2,7 +2,7 @@
 title: IPO Forensic Analysis Engine — Database Schema
 document_id: DB-IPO-001
 version: 0.1
-status: Proposed MVP schema baseline; validate with the Data Contract before migrations
+status: Proposed persistence baseline; align to docs/implementation-blueprint.md before migrations
 last_updated: 29 October 2026
 canonical_source: Markdown in GitHub
 scope: Indian Mainboard IPOs only; local-first; single-user; ₹0 budget
@@ -14,7 +14,7 @@ scope: Indian Mainboard IPOs only; local-first; single-user; ₹0 budget
 
 This document defines the **first concrete persistence schema** for the MVP vertical slice. It complements, rather than replaces, the Indicator Catalogue & Data Dictionary and Technical Design.
 
-**Status: proposed v0.1 baseline.** The repository previously described the logical entities but did not contain this concrete database-schema document. Before production migrations are written, align these tables with the first API Data Contract and validate them with representative IPO fixtures. This is a schema proposal, not an implemented or runtime-tested database.
+**Status: proposed v0.1 persistence baseline.** The API/Data Contract has now been frozen in [Implementation Blueprint & Data Contract](implementation-blueprint.md). This existing schema document predates that contract and has known alignment work below; do not implement migration 0001 until the two agree and representative IPO fixtures/tests are ready. This document is a schema proposal, not an implemented or runtime-tested database.
 
 The schema supports the required workflow:
 
@@ -154,7 +154,7 @@ Do not compress all quality concepts into one confidence score:
 - **Conflicts:** retain every source-specific observation and represent the conflict in review/findings; do not overwrite or silently average.
 - **Unknown timestamps:** preserve null and surface uncertainty instead of inventing a time.
 
-Exact API enum casing and status transitions belong to the Data Contract. If its vocabulary changes, update schema constraints, backend models, generated types, tests and this document together.
+Exact API enum casing/status values are frozen in [Implementation Blueprint & Data Contract](implementation-blueprint.md). Persisted column names may remain snake_case, but values, nullability and allowed transitions must align with that contract. Update schema constraints, backend models, generated types and tests together when it changes.
 
 ## 7. Security and local-data rules
 
@@ -200,3 +200,35 @@ Provider-specific connectors remain a separate feasibility gate. That uncertaint
 6. Validate with representative fixtures and the source-feasibility benchmark. Any critical category lacking a free/permitted retrieval route needs an explicit product-owner decision before release.
 
 No source provider or retrieval success is implied by this schema. No application feature is implemented until code and tests demonstrate it.
+
+
+---
+
+## 11. Required alignment to the frozen Implementation Blueprint
+
+The first schema tables above are a useful starting point, but the document was drafted before the exact P0 API contract. The [Implementation Blueprint](implementation-blueprint.md) is now authoritative for API object semantics and exact wire names. The migration target must include and align these details before Alembic migration 0001 is committed:
+
+| Alignment item | Required persisted-model/schema decision |
+|---|---|
+| Identity candidates | Add an identity_candidates table or equivalent persisted model so discovery candidates can be reviewed/reopened without being mistaken for a confirmed issue. Link candidates to case, source and evidence; persist segment, issue dates/price band where known, source record ID, discovery time and candidate status. |
+| Case/identity fields | Map public caseStatus and identityStatus to explicit persisted columns/state rules. The case may exist with nullable issue_id while identity is unresolved. Confirmed issue records must be Mainboard only. |
+| Source state vs attempt state | Persist source access/approval state separately from connector enablement and individual acquisition_attempts. A disabled provider is not a successful/failed attempt. Preserve each real attempt and its category, timestamps, returned fields and failure reason. |
+| Observations and facts | Preserve decimal values as canonical decimal strings in TEXT, source/raw text, definition, segment/category, separate published/observed/retrieved/recorded timestamps, review rationale and supersession links. Do not infer unknown times. |
+| Analysis results | Add an analysis_results table keyed to analysis_runs and a stable result key/indicator code; persist status, decimal/text value, formula code/version, input fact/observation IDs, evidence links, reason and display-safe explanation. |
+| Scenario definition vs result | Use separate scenario_definitions and scenario_results. A scenario definition is a case-level assumption set; a scenario result belongs to a specific analysis run and snapshots the exact assumptions/results used. Do not store mutable assumptions only inside one result row. |
+| Report snapshot vs exported artifact | Use a reports table for immutable structured report content/snapshot/hash/template/cutoff and a separate report_artifacts table for HTML/DOCX files, hash, size, safe relative path and timestamps. A report exists even before an export is made. |
+| API/run status values | Persist the contract's run statuses (completed, partial, failed) and calculation result statuses (calculated, qualified, skipped, not_applicable, invalid) where applicable; never describe partial runs as fully completed. |
+| File metadata | Persist original filename for display, MIME/size/hash and a safe relative path, but do not expose paths in API payloads. Store original bytes outside SQLite. |
+| Snapshots and hashes | Snapshot records require schema/formula/rule/software versions, explicit cutoff, all selected source IDs/record IDs/review states/units/timestamps and a stable hash. Report snapshots need their own version/hash. |
+| IDs and API aliases | Use UUID text keys and snake_case database columns; public JSON camelCase is implemented by Pydantic aliases, not by renaming SQL columns. |
+| Enum/constraint parity | Align SQLite CHECK constraints/foreign keys with exact enums in the Blueprint; test all valid values and reject invalid values. Enable PRAGMA foreign_keys on every connection. |
+
+### 11.1 Required order before migration 0001
+
+1. Implement Pydantic models from docs/implementation-blueprint.md.
+2. Adjust this schema document and SQLAlchemy models to match the contract semantics above.
+3. Generate the initial Alembic migration from the reviewed models; inspect the generated migration manually.
+4. Test a fresh database, all foreign keys, representative records, restart persistence and invalid enum/reference rejection.
+5. Verify the actual OpenAPI-generated TypeScript types match the response/request models.
+
+Do not treat this addendum as proof that the migration or code already exists. It records the work required to make the persisted schema match the frozen API contract.
