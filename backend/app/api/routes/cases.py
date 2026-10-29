@@ -145,11 +145,14 @@ def confirm_identity(case_id: str, payload: ConfirmIdentityRequest, db: Session 
     if payload.manual_issue is None:
         raise HTTPException(status_code=422, detail="A manual Mainboard issue is required in this build.")
     evidence_ids = payload.identity_evidence_ids
-    found = set(db.scalars(
-        select(EvidenceItem.id).where(EvidenceItem.case_id == case.id, EvidenceItem.id.in_(evidence_ids))
+    evidence_rows = list(db.scalars(
+        select(EvidenceItem).where(EvidenceItem.case_id == case.id, EvidenceItem.id.in_(evidence_ids))
     ))
+    found = {item.id for item in evidence_rows}
     if found != set(evidence_ids):
         raise HTTPException(status_code=422, detail="Every identity evidence item must belong to this research case.")
+    if any(item.verification_status != "reviewed" for item in evidence_rows):
+        raise HTTPException(status_code=422, detail="Review each identity evidence item before confirming the IPO identity.")
     manual = payload.manual_issue
     now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     issuer = Issuer(id=str(uuid4()), legal_name=manual.issuer_legal_name, created_at=now, updated_at=now)
