@@ -66,3 +66,11 @@ export async function uploadEvidencePdf(caseId: string, file: File, metadata: {
   }
   return response.json() as Promise<EvidenceItem>;
 }
+
+
+export function reviewEvidence(caseId: string, evidenceId: string, action: "verify" | "mark_conflicted" | "reject", rationale?: string): Promise<EvidenceItem> {
+  return apiPost<EvidenceItem, { action: typeof action; rationale?: string }>(
+    `/cases/${caseId}/evidence/${evidenceId}/review`,
+    { action, ...(rationale ? { rationale } : {}) }
+  );
+}
