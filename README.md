@@ -32,3 +32,41 @@ The repository Markdown files are the source of truth. Update the existing file 
 ## Current status
 
 The project requirements, evidence-source baseline, application flow, UI/UX design, technical architecture, proposed SQLite schema, and implementation plan are recorded in the canonical Markdown documents. The [Implementation Blueprint & Data Contract](docs/implementation-blueprint.md) now fixes the P0 frontend/backend stack, target file tree, API paths, JSON fields, nullability, enums, error envelope, configuration variables, local storage layout and build gates. These are specifications, not evidence that the application has been implemented or tested. Before feature development, validate the local scaffold, align docs/database-schema.md and migration 0001 with the blueprint, approve the initial P0 formula register and define representative fixtures. Implementation must work without paid services, a single external provider or AI. Source-acquisition orchestration and interconnection of available fundamentals, valuation, QIB/NII/retail subscription and GMP signals remain required; connectors need dated feasibility evidence before enablement.
+
+
+## Local development
+
+The working application changes are being built on a review branch from the scaffold. Review the active pull request before merging.
+
+### Prerequisites
+
+- Python 3.11 or newer.
+- Node.js 22.22 or newer (the chosen React Router v8 release requires Node.js 22.22+; the current Vite release also has a minimum Node.js version).
+- Git.
+
+### Start the app with one command (Windows PowerShell)
+
+From the repository root, run `.\\scripts\\start-dev.ps1`. For manual setup, use the backend and frontend commands below.
+
+### Start the backend (Windows PowerShell)
+
+    cd backend
+    py -m venv .venv
+    .\.venv\Scripts\Activate.ps1
+    python -m pip install --upgrade pip
+    pip install -e ".[dev]"
+    uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+
+The API applies checked-in Alembic migrations at startup, stores research cases and evidence in the per-user SQLite database, supports evidence-backed manual Mainboard identity confirmation, local PDF upload with SHA-256 integrity hashes, human evidence review, manual evidence-linked facts and listing-signal observations with indicator-catalogue IDs and explicit human review, Decimal-based gross listing-scenario calculations, analysis-readiness diagnostics, partial immutable analysis runs for saved scenario gross returns, and immutable report snapshots with offline HTML/DOCX exports. It exposes case create/list/reopen/rename/archive endpoints. No automated source connectors or financial formula registry is enabled yet.
+
+### Start the frontend (a second terminal)
+
+    cd frontend
+    npm install
+    npm run dev
+
+Open http://127.0.0.1:5173. The screen should show whether the local API is reachable. From the frontend folder, run npm run typecheck, npm run lint and npm test. From the backend folder, run pytest.
+
+### Important current limitation
+
+The app currently supports local research cases, manual evidence registration, local PDF upload with SHA-256 hashes, evidence review, evidence-backed manual Mainboard identity confirmation, and readiness diagnostics. The formula registry, manual fact/observation review, acquisition attempts, deterministic analysis runs, scenarios, report generation, and backup/restore remain unimplemented. Do not treat readiness as an analysis result.
