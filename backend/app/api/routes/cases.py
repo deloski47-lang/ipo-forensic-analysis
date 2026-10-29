@@ -76,7 +76,7 @@ def list_cases(
                 title=case.title,
                 case_status=case.case_status,
                 identity_status=case.identity_status,
-                issue_display_name=None,
+                issue_display_name=(db.get(IpoIssue, case.issue_id).display_name if case.issue_id and db.get(IpoIssue, case.issue_id) else None),
                 last_activity_at=case.last_activity_at,
                 latest_analysis_run_id=case.latest_analysis_run_id,
                 latest_report_id=case.latest_report_id,
