@@ -299,6 +299,7 @@ Components should be named for their domain purpose, not their visual appearance
 - DataTable / NumericCell / UnitLabel
 - EvidenceRow / EvidenceDetails
 - SourceCitation / SourceLocator
+- AcquisitionStatusPanel / SourceAcquisitionRow / RefreshSourcesAction
 - FactReviewPanel / CandidateDecisionControls
 - ConflictComparison
 - ReadinessChecklist
@@ -603,6 +604,7 @@ The owner-controlled hero region remains undefined and should not be filled by a
 ### 9.3 Case overview
 
 - Present issuer/issue identity and status at top of the workspace.
+- Show a clear source-acquisition summary after identity resolution: attempted sources, returned signal categories, last attempt/refresh, timestamps/freshness, partial coverage, blocked/unavailable sources and actionable retry/manual fallback.
 - Show next steps through an actionable readiness summary.
 - Use distinct counts/status summaries for facts needing review, conflicts and missing evidence only when those counts are actually known.
 - Keep prior run/report information clearly tied to that run.
@@ -633,7 +635,8 @@ The owner-controlled hero region remains undefined and should not be filled by a
 - Use an explicit preflight checklist before the run action.
 - Display blockers and qualified/partial conditions separately.
 - Show information cutoff and relevant freshness limitations.
-- The primary “Run analysis” action is enabled only when required gates pass according to the approved policy; backend validation remains authoritative.
+- Show acquisition status for critical signal families (subscription by category, GMP, company/offer facts and relevant event/context inputs) separately from calculation readiness. A source failure is not a zero and a non-attempted source is not a successful refresh.
+- The primary “Run analysis” action is enabled only when required gates pass according to the approved policy; backend validation remains authoritative. Qualified partial analysis must state which signal relationships could not run and why.
 - For a blocked action, explain why and link to the resolution screen.
 - Don't present a 0–100 completeness ring unless its definition is explicitly approved and meaningful.
 
@@ -670,7 +673,7 @@ The owner-controlled hero region remains undefined and should not be filled by a
 - Keep the page small and operational.
 - No login, billing, team, cloud-sync or subscription settings.
 - Backup/restore controls must state exactly what they do and require explicit confirmation for overwrite/restore.
-- Optional-provider status appears only if an approved optional provider exists.
+- The acquisition status panel is a core product component; show connector-level details only for approved/enabled connectors and never imply universal coverage.
 - Do not expose saved API secrets in plain text.
 
 ---
@@ -860,7 +863,9 @@ The design system is ready for implementation when:
 11. Keyboard focus, dialog focus, contrast, status labels and responsive layout are tested.
 12. No animation conceals missing data, changes a number, fakes progress or claims save/export success before confirmation.
 13. No paid asset, paid UI kit, paid animation library or required external runtime service is introduced.
-14. The user can complete the manual-first core workflow even when Google Fonts or optional remote resources are unavailable.
+14. The user can complete the local/manual fallback workflow even without internet or remote fonts; when online, the interface clearly surfaces approved source-acquisition attempts and does not imply a source was checked if retrieval failed.
+15. The case overview and analysis preflight make acquisition coverage/freshness visible, with distinct attempted/succeeded/partial/unavailable/blocked states.
+16. The findings/results presentation supports interconnected comparisons across company/offer fundamentals, valuation, QIB/NII/retail subscription, GMP and relevant company/market events while preserving provenance and contrary evidence.
 
 ---
 
