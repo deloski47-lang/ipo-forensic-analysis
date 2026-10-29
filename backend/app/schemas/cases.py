@@ -49,7 +49,7 @@ class CaseDetail(ApiSchema):
     title: str
     case_status: CaseStatus
     identity_status: IdentityStatus
-    issue: None = None
+    issue: dict | None = None
     created_at: datetime
     updated_at: datetime
     last_activity_at: datetime
