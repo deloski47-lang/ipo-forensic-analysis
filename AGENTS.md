@@ -11,10 +11,10 @@ The filenames above are the actual existing canonical files in this repository. 
 1. The total project budget is **₹0**. Do not introduce paid APIs, datasets, AI, hosting, software, upgrades, trials that require payment details, or paid fallbacks.
 2. Never assume an API, data source, model, feature or free tier is free. Verify current pricing, terms, rate limits, attribution, historical access and failure behaviour before proposing an integration.
 3. Scope is **Indian Mainboard IPOs only**. Do not implement SME IPO support.
-4. Core operation is local-first and manual-first. Failure or absence of an optional integration must not block evidence entry, deterministic calculation or reporting.
+4. Core operation is local-first with a complete manual/offline fallback. **IPO-name-triggered source-acquisition orchestration and the first interconnected signal checks are P0 product requirements.** Individual source connectors are enabled only after free/permitted-use, coverage, timestamp and failure behaviour are verified. Connector failure must not block manual evidence entry, unrelated valid calculations or reporting, and must never be represented as successful retrieval.
 5. AI is assistive only. It must never invent values, sources, citations, locators, timestamps, disclosures or missing data. Unknown is not zero.
 6. Material financial calculations must be deterministic, input-traceable and covered by known-answer, missing-input and invalid-input tests.
-7. The full core workflow must not require a paid service, a hosted database, a public deployment or an AI/data API.
+7. The core workflow must not require a paid service, a hosted database, public deployment, AI API or a single external data provider. Do not interpret this as permission to omit the acquisition orchestrator: implement source discovery/status/history plus approved connectors for signal categories that pass the feasibility gate. If a critical signal has no free/permitted route, record and escalate the scope decision before release.
 8. For UI/frontend/animation tasks in Claude Code, use the Anthropic-verified Frontend Design plugin/skill (https://claude.com/plugins/frontend-design). If unavailable, disclose that fact; never claim it was used if it was not.
 9. The hero source is 21st.dev, but the product owner selects the exact component. Do not implement it before the source URL/code is supplied. Check the specific licence/current terms, do not incur costs, do not copy protected marketplace preview media, and add a visible link to the original component page/author as required.
 10. Preserve the product owner's exact colour palette and typography. Use readable high-contrast combinations, respect reduced motion, and use only free/open-source Motion—not Motion+ or private paid packages.
@@ -43,4 +43,5 @@ The filenames above are the actual existing canonical files in this repository. 
 - Review diffs before committing. Never discard unrelated work.
 - Do not promise listing gains or present an unvalidated prediction as a probability.
 - Never claim the application or a test was verified unless it was actually run. A documentation/repository review is not a runtime test.
+- Never silently downgrade source acquisition or interconnected QIB/NII/retail, GMP, company/offer and market-signal analysis to manual-only because a provider has not been found; report the feasibility gap and seek an explicit decision.
 - Before frontend implementation, follow `docs/design.md` and use the required Frontend Design skill in Claude Code; do not improvise around the owner's hero decision.
