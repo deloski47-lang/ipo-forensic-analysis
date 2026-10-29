@@ -157,7 +157,7 @@ The product owner supplied this Google Fonts import:
 @import url('https://fonts.googleapis.com/css?family=Afacad%20Flux:700|Afacad%20Flux:400');
 ~~~
 
-Preserve Afacad Flux as the selected font. For implementation, a stylesheet link with suitable preconnect/font-display behaviour may be preferable to blocking on a CSS import, but do not silently substitute the family. Because the app is local-first, the UI must remain usable when Google Fonts cannot be fetched: fall back cleanly and never block application startup on the font request. Do not make core app functionality depend on Google Fonts being online.
+Preserve Afacad Flux as the selected font. For implementation, a stylesheet link with suitable preconnect behaviour and `display=swap` may be preferable to a blocking CSS import, but do not silently substitute the family. Because the app is local-first, the UI must remain usable when Google Fonts cannot be fetched: fall back cleanly and never block application startup on the font request. Do not make core app functionality depend on Google Fonts being online.
 
 ### 4.2 Exact base type scale
 
@@ -426,7 +426,7 @@ Do not use:
 
 **Recommended baseline:** CSS transitions for simple hover/focus/active states, plus **Motion for React** (npm package: motion; imports from motion/react) for route/content presence, shared layout and complex state changes where CSS alone would be awkward.
 
-This is a recommended dependency, not something already installed or tested. During the scaffold, confirm its React compatibility, pin a compatible version in the lockfile, and keep the imported feature set small. It has no paid service requirement. Do not add GSAP or a second animation library on top unless a concrete requirement demonstrates a need.
+This is a recommended dependency, not something already installed or tested. During the scaffold, confirm its React compatibility, pin a compatible version in the lockfile, and keep the imported feature set small. Use only the free/open-source `motion` package under its MIT license. Do not use Motion+, `motion-plus`, Motion UI from the private registry, premium APIs, paid examples or paid editor/audit features. Do not add GSAP or a second animation library on top unless a concrete requirement demonstrates a need.
 
 Native CSS View Transitions may be evaluated later as progressive enhancement, but do not build two competing route-transition systems or animate the same component with both Motion and View Transitions. The initial MVP should have one predictable motion implementation that can be disabled/reduced and tested.
 
@@ -716,7 +716,13 @@ The reduced-motion example is a baseline illustration. Review animation-specific
 For a non-hero content region, Motion can provide a short presence transition. Use a stable key tied to the screen/route, and ensure that the router preserves correct history/focus behaviour.
 
 ~~~tsx
+import type { ReactNode } from "react";
 import { AnimatePresence, motion, MotionConfig } from "motion/react";
+
+type AppPageTransitionProps = {
+  pageKey: string;
+  children: ReactNode;
+};
 
 const pageVariants = {
   initial: { opacity: 0, y: 8 },
@@ -724,7 +730,7 @@ const pageVariants = {
   exit: { opacity: 0, y: -4 },
 };
 
-export function AppPageTransition({ pageKey, children }) {
+export function AppPageTransition({ pageKey, children }: AppPageTransitionProps) {
   return (
     <MotionConfig reducedMotion="user">
       <AnimatePresence mode="wait" initial={false}>
@@ -894,6 +900,7 @@ Any agent building the UI must:
 Official documentation used to inform the recommended motion/accessibility implementation. Recheck current details during implementation:
 
 - Motion for React installation and React/Vite setup: https://motion.dev/docs/react-installation
+- Motion package source and MIT license (use the open-source package only; do not use paid Motion+ features): https://github.com/motiondivision/motion
 - Motion for React layout animations and shared layout transitions: https://motion.dev/docs/react-layout-animations
 - Motion for React exit/presence transitions: https://motion.dev/docs/react-animate-presence
 - MDN — View Transition API concepts and browser behaviour: https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API
