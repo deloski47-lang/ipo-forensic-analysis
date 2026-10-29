@@ -1,6 +1,6 @@
 import { apiGet, apiPost } from "./client";
 
-export type EvidenceKind = "web_page" | "manual_note" | "manual_value" | "uploaded_document";
+export type EvidenceKind = "web_page" | "manual_note" | "manual_value" | "document";
 
 export interface EvidenceItem {
   evidenceId: string;
@@ -16,7 +16,7 @@ export interface EvidenceItem {
   publishedAt: string | null;
   capturedAt: string;
   locator: string | null;
-  verificationStatus: "unverified" | "user_verified" | "conflicting" | "rejected";
+  verificationStatus: "unverified" | "reviewed" | "conflicting" | "rejected";
   notes: string | null;
   downloadUrl: string | null;
   localAvailable: boolean;
