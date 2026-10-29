@@ -15,6 +15,9 @@ The filenames above are the actual existing canonical files in this repository. 
 5. AI is assistive only. It must never invent values, sources, citations, locators, timestamps, disclosures or missing data. Unknown is not zero.
 6. Material financial calculations must be deterministic, input-traceable and covered by known-answer, missing-input and invalid-input tests.
 7. The full core workflow must not require a paid service, a hosted database, a public deployment or an AI/data API.
+8. For UI/frontend/animation tasks in Claude Code, use the Anthropic-verified Frontend Design plugin/skill (https://claude.com/plugins/frontend-design). If unavailable, disclose that fact; never claim it was used if it was not.
+9. The hero source is 21st.dev, but the product owner selects the exact component. Do not implement it before the source URL/code is supplied. Check the specific licence/current terms, do not incur costs, do not copy protected marketplace preview media, and add a visible link to the original component page/author as required.
+10. Preserve the product owner's exact colour palette and typography. Use readable high-contrast combinations, respect reduced motion, and use only free/open-source Motion—not Motion+ or private paid packages.
 
 ## Documentation and decisions
 
@@ -40,3 +43,4 @@ The filenames above are the actual existing canonical files in this repository. 
 - Review diffs before committing. Never discard unrelated work.
 - Do not promise listing gains or present an unvalidated prediction as a probability.
 - Never claim the application or a test was verified unless it was actually run. A documentation/repository review is not a runtime test.
+- Before frontend implementation, follow `docs/design.md` and use the required Frontend Design skill in Claude Code; do not improvise around the owner's hero decision.
