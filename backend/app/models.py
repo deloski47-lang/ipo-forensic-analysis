@@ -9,8 +9,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db import Base
 
 
-def utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def new_uuid() -> str:
@@ -33,9 +33,9 @@ class ResearchCase(Base):
     case_status: Mapped[str] = mapped_column(String(32), nullable=False, default="identity_pending", index=True)
     identity_status: Mapped[str] = mapped_column(String(32), nullable=False, default="unresolved")
     issue_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(nullable=False, default=utc_now)
-    updated_at: Mapped[datetime] = mapped_column(nullable=False, default=utc_now, onupdate=utc_now)
-    last_activity_at: Mapped[datetime] = mapped_column(nullable=False, default=utc_now, index=True)
+    created_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now)
+    updated_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now, onupdate=utc_now)
+    last_activity_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now, index=True)
     latest_analysis_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     latest_report_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     case_changed_since_last_run: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
