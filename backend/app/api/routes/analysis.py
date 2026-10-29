@@ -112,7 +112,7 @@ def create_analysis_run(
     facts = [item for item in db.scalars(select(FactRecord).where(FactRecord.case_id == case.id)) if parse_time(item.recorded_at) <= cutoff]
     observations = [item for item in db.scalars(select(MarketObservation).where(MarketObservation.case_id == case.id)) if parse_time(item.recorded_at) <= cutoff]
     evidence = [item for item in db.scalars(select(EvidenceItem).where(EvidenceItem.case_id == case.id)) if parse_time(item.captured_at) <= cutoff]
-    scenarios = [item for item in db.scalars(select(ScenarioDefinition).where(ScenarioDefinition.case_id == case.id)) if parse_time(item.created_at) <= cutoff]
+    scenarios = sorted([item for item in db.scalars(select(ScenarioDefinition).where(ScenarioDefinition.case_id == case.id)) if parse_time(item.created_at) <= cutoff], key=lambda item: (item.created_at, item.id))
     if not scenarios:
         raise HTTPException(status_code=409, detail={
             "code": "ANALYSIS_BLOCKED",
@@ -155,7 +155,7 @@ def create_analysis_run(
             "scenarioId": item.id, "label": item.label, "entryPrice": item.entry_price,
             "exitPrice": item.exit_price, "quantity": item.quantity, "assumptionNote": item.assumption_note,
             "createdAt": item.created_at,
-        } for item in sorted(scenarios, key=lambda row: row.id)],
+        } for item in scenarios],
         "enabledFormulaCodes": ["RISK-03"],
         "disabledFormulaScope": "All non-scenario IPO analysis formulas remain disabled until the P0 formula register is approved.",
     }
