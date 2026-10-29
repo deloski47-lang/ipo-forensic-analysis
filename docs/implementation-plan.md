@@ -23,7 +23,7 @@ Use it together with the existing canonical files:
 5. [Application Flow](app-flow.md)
 6. [UI/UX Design Specification](design.md)
 7. [Technical Design](TECHNICAL_DESIGN.md)
-8. [Proposed Database Schema v0.1](database-schema.md)
+8. [Proposed Database Schema v0.2](database-schema.md)
 9. [Implementation Blueprint & Data Contract](implementation-blueprint.md)
 10. [Repository rules](../AGENTS.md)
 
