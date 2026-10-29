@@ -44,6 +44,10 @@ The working application changes are being built on a review branch from the scaf
 - Node.js 22.22 or newer (the chosen React Router v8 release requires Node.js 22.22+; the current Vite release also has a minimum Node.js version).
 - Git.
 
+### Start the app with one command (Windows PowerShell)
+
+From the repository root, run `.\\scripts\\start-dev.ps1`. For manual setup, use the backend and frontend commands below.
+
 ### Start the backend (Windows PowerShell)
 
     cd backend
@@ -65,4 +69,4 @@ Open http://127.0.0.1:5173. The screen should show whether the local API is reac
 
 ### Important current limitation
 
-This scaffold is only the first build foundation. Case creation, persistent SQLite models/migrations, evidence upload, manual fact entry, acquisition orchestration, analysis runs, scenario calculations and reports are not implemented by the scaffold commit. Do not enter real research data until persistence and backup/restore have been implemented and tested.
+The app currently supports local research cases, manual evidence registration, local PDF upload with SHA-256 hashes, evidence review, evidence-backed manual Mainboard identity confirmation, and readiness diagnostics. The formula registry, manual fact/observation review, acquisition attempts, deterministic analysis runs, scenarios, report generation, and backup/restore remain unimplemented. Do not treat readiness as an analysis result.
