@@ -1,4 +1,5 @@
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { getHealth, type HealthResponse } from "../api/client";
 import { createCase, listCases, type CaseSummary } from "../api/cases";
 
