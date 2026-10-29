@@ -44,7 +44,7 @@ Use the following order:
 
 If two sources conflict, identify the conflict and its consequences, then propose a resolution. Never choose whichever version is easiest to implement and silently call it approved.
 
-**Known scope inconsistency found during validation:** the current PRD v1.0 uses the broader phrase “Indian IPOs,” and the Data Source & Feasibility Audit v1.0 still presents Mainboard-versus-SME coverage as an open question. The binding repository rule in `AGENTS.md` and the product owner's explicit decision are stricter: **Mainboard IPOs only; SME IPOs are out of scope**. Follow that stricter constraint in implementation. Before feature implementation, reconcile the affected wording in the existing PRD and audit files in place; do not create duplicate versions.
+**Scope reconciliation completed during validation:** the existing PRD, Data Source & Feasibility Audit, Project Brief and Indicator Catalogue were updated in place to state the binding decision: **Indian Mainboard IPOs only; SME IPOs are out of scope; total budget is ₹0**. Their existing filenames and histories are preserved; no duplicate source documents were created. If any older wording is encountered elsewhere, the binding project constraints and these explicit scope clarifications take precedence.
 
 ### 1.3 Decision-status labels
 
@@ -1500,6 +1500,6 @@ Project-specific evidence-source research stays in the Data Source & Feasibility
 - Local upload validation must check actual file content and size, not trust filename/Content-Type alone.
 - No exact endpoint payloads, formula register, supported PDF matrix, database schema or adapter has been claimed as implemented or tested.
 
-**Known document inconsistency:** current PRD/audit v1.0 wording leaves Mainboard-versus-SME scope ambiguous, while `AGENTS.md` and the product owner's binding decision restrict scope to Mainboard IPOs. Implementation must obey the binding restriction. The conflicting scope wording should be corrected in place in the affected source documents before feature implementation; do not create parallel versions.
+**Cross-document scope check:** completed. The existing PRD, Data Source & Feasibility Audit, Project Brief and Indicator Catalogue now state Mainboard-only coverage and the ₹0 constraint. Agent instructions and README links were also corrected in place.
 
 **Validation limitations:** this was a specification/repository review, not an application test run. The repository currently has no application implementation to execute, so no runtime, migration, contract or end-to-end test is claimed to have passed. Architecture recommendations remain proposals until the initial scaffold and tests verify them.
