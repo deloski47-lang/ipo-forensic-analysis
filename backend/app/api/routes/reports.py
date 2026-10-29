@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.db import get_db
-from app.models import AnalysisRun, Report as ReportModel, ReportArtifact as ArtifactModel, ResearchCase
+from app.models import AnalysisResult, AnalysisRun, Finding, Report as ReportModel, ReportArtifact as ArtifactModel, ResearchCase
 from app.schemas.reports import (
     CreateReportExportRequest, CreateReportRequest, ReportArtifact, ReportDetail,
     ReportListResponse, ReportSection,
@@ -45,14 +45,6 @@ def get_report(db: Session, case_id: str, report_id: str) -> ReportModel:
     if report is None or report.case_id != case.id:
         raise HTTPException(status_code=404, detail="Report not found.")
     return report
-
-
-def serialize_artifact(item: ArtifactModel) -> ReportArtifact:
-    return ReportArtifact(
-        artifact_id=item.id, report_id=item.report_id, format=item.format, sha256=item.sha256,
-        size_bytes=item.size_bytes, created_at=datetime.fromisoformat(item.created_at.replace("Z", "+00:00")),
-        download_url=f"/api/v1/cases/{item.report_id}/reports/{item.report_id}/exports/{item.id}/download",
-    )
 
 
 def serialize_report(db: Session, item: ReportModel) -> ReportDetail:
@@ -90,12 +82,8 @@ def create_report(case_id: str, payload: CreateReportRequest, db: Session = Depe
         raise HTTPException(status_code=422, detail="The analysis run must belong to this research case.")
     snapshot_input = json.loads(run.input_snapshot_json)
     issue = snapshot_input["issue"]
-    results = list(db.scalars(select(__import__("app.models", fromlist=["AnalysisResult"]).AnalysisResult).where(
-        __import__("app.models", fromlist=["AnalysisResult"]).AnalysisResult.analysis_run_id == run.id
-    )))
-    findings = list(db.scalars(select(__import__("app.models", fromlist=["Finding"]).Finding).where(
-        __import__("app.models", fromlist=["Finding"]).Finding.analysis_run_id == run.id
-    )))
+    results = list(db.scalars(select(AnalysisResult).where(AnalysisResult.analysis_run_id == run.id)))
+    findings = list(db.scalars(select(Finding).where(Finding.analysis_run_id == run.id)))
     sections = [
         {
             "sectionCode": "issue_identity",
