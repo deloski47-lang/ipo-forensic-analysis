@@ -81,7 +81,7 @@ export default function CasesPage() {
     setCreating(true);
     try {
       const created = await createCase({ enteredName: name, ...(customTitle.trim() ? { title: customTitle.trim() } : {}) });
-      setCases((previous) => [created, ...previous]);
+      setCases((previous) => [{ ...created, issueDisplayName: null }, ...previous]);
       setEnteredName("");
       setCustomTitle("");
     } catch (error) {
