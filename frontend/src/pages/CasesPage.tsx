@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router";
 import type { FormEvent } from "react";
 import { getHealth, type HealthResponse } from "../api/client";
 import { createCase, listCases, type CaseSummary } from "../api/cases";
@@ -128,7 +129,7 @@ export default function CasesPage() {
           {casesLoading ? <p className="muted" aria-live="polite">Loading cases from your local database…</p> :
             cases.length === 0 ? <div className="empty-cases"><span className="empty-icon" aria-hidden="true">＋</span><h3>No research cases yet</h3><p className="muted">Create your first case. It will remain here after you restart the app.</p></div> :
               <div className="case-list">{cases.map((item) => <article className="case-row" key={item.caseId}>
-                <div className="case-row-main"><h3>{item.title}</h3><p className="case-entered-name">{item.enteredName}</p><p className="case-meta">Last activity {formatDate(item.lastActivityAt)}</p></div>
+                <div className="case-row-main"><h3><Link to={"/cases/" + item.caseId}>{item.title}</Link></h3><p className="case-entered-name">{item.enteredName}</p><p className="case-meta">Last activity {formatDate(item.lastActivityAt)}</p></div>
                 <div className="case-row-status"><span className={"case-status status-" + item.caseStatus}>{item.caseStatus.replaceAll("_", " ")}</span><span className="identity-status">{item.identityStatus.replaceAll("_", " ")}</span></div>
               </article>)}</div>}
         </section>
