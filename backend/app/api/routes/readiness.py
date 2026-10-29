@@ -16,6 +16,11 @@ def utc_now() -> datetime:
 
 
 def get_case(db: Session, case_id: str) -> ResearchCase:
+    try:
+        from uuid import UUID
+        case_id = str(UUID(case_id))
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail="Research case not found.") from exc
     case = db.get(ResearchCase, case_id)
     if case is None:
         raise HTTPException(status_code=404, detail="Research case not found.")
