@@ -31,7 +31,7 @@ def test_readiness_reflects_user_reviewed_evidence(local_data_dir: Path) -> None
             json={"action": "verify", "rationale": "Compared with the source document."},
         )
         assert reviewed.status_code == 200
-        assert reviewed.json()["verificationStatus"] == "user_verified"
+        assert reviewed.json()["verificationStatus"] == "reviewed"
         readiness = client.get(f"/api/v1/cases/{case['caseId']}/analysis/readiness").json()
         codes = {item["code"] for item in readiness["blockers"]}
         assert "NO_EVIDENCE_REGISTERED" not in codes
