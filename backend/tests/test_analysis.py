@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from decimal import Decimal
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -44,7 +45,7 @@ def test_analysis_run_snapshots_scenario_and_remains_immutable(local_data_dir: P
         run = run_response.json()
         assert run["runStatus"] == "partial"
         assert run["results"][0]["indicatorCode"] == "RISK-03"
-        assert run["results"][0]["valueDecimal"] == "25"
+        assert Decimal(run["results"][0]["valueDecimal"]) == Decimal("25")
         run_id = run["analysisRunId"]
         snapshot_hash = run["inputSnapshotHash"]
 
