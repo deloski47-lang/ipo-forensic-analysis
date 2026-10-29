@@ -112,7 +112,7 @@ The user needs to:
 
 ## 6. Scope and release boundaries
 
-The first release must be useful as a manual-first research tool before the project invests in fragile automation. The stages below describe product scope, not a commitment to a specific technology.
+The first release must deliver interconnected forensic analysis across company fundamentals, offer/valuation, category-wise subscription demand, GMP and relevant market/company signals where available. The system must attempt automated issue/source discovery and retrieval through approved connectors rather than requiring the user to manually hunt every signal. Manual entry and evidence upload remain complete fallbacks, including when offline. The source providers and access methods must pass a documented free/permitted-use and data-quality gate; do not promise data that has not been verified. A missing free/permitted route for a critical signal must be escalated as an explicit product-owner decision before release, not silently used to defer the capability.
 
 ### 6.1 MVP: manual-first forensic report
 
@@ -120,17 +120,17 @@ The MVP must support:
 
 1. Create and identify an IPO research case.
 2. Add offer documents and evidence files, and record source metadata.
-3. Enter or confirm key issue details and time-sensitive observations manually.
+3. Resolve the IPO identity from the entered name/available identifiers, then automatically attempt source discovery and retrieval for supported signal categories using approved connectors; let the user confirm ambiguous matches. Manual entry remains available for all required facts and observations.
 4. Allow manual entry of facts as a complete fallback. If extraction is implemented, treat extracted values as candidates and show them for user review before they become trusted inputs.
 5. Record source locators such as document version, page, section or table.
 6. Compute a selected set of applicable financial and offer metrics deterministically.
 7. Show data quality, completeness, freshness, conflicting values and unresolved questions.
-8. Run a first set of high-value cross-check rules.
+8. Run a first set of high-value cross-check rules that explicitly connect financial/offer quality and valuation with QIB/NII/retail subscription, GMP, free-float/issue-size context and available market/company-event signals.
 9. Create a listing-day scenario section where inputs permit it, clearly separating verified observations from assumptions.
 10. Generate and export a structured report with citations, findings, limitations and an overall qualified assessment.
 11. Reopen a saved research case and review its source evidence and latest report.
 
-The MVP must not require automated news, Trends, subscription, GMP, exchange APIs, paid AI APIs, or AI-based document extraction to function. Those values may be manually entered with their source and timestamp. AI-assisted extraction is optional and must fail safely to manual entry.
+The MVP must not depend on any single paid, unverified or always-online API, and manual entry must remain available. However, source discovery/acquisition orchestration and core signal interconnection are intended MVP capabilities. On IPO entry/identity confirmation, the application must attempt retrieval through approved free/permitted source adapters for the signal categories that passed feasibility testing, including official category-wise subscription data and named unofficial GMP sources where a feasible route exists. If a source/category cannot be retrieved, show the exact source status and offer manual capture; never silently act as if the signal was checked. Before release, document representative-IPO coverage and resolve any critical signal category for which no lawful, free route is available. AI-assisted extraction remains optional and must fail safely to manual review.
 
 ### 6.2 Follow-on release: market-signal enrichment
 
@@ -215,7 +215,8 @@ Priority definitions: **P0** = required for MVP; **P1** = follow-on; **P2** = la
 | FR-012 | P0 | Preserve original uploaded evidence and document version identity. | Replacing a file does not silently change what supported an earlier report. |
 | FR-013 | P0 | Display document coverage and expected-but-missing evidence. | The report shows material gaps and the basis for required-document expectations. |
 | FR-014 | P0 | Preserve conflicting sources and allow resolution status/notes. | Conflicts are not silently overwritten or averaged. |
-| FR-015 | P1 | Support source adapters for verified, useful automated retrieval. | Each adapter has documented coverage, source terms, timestamp rules and graceful failure behaviour. |
+| FR-015 | P0 | Provide source-acquisition orchestration that discovers and attempts retrieval from approved source adapters after IPO identity resolution. | The user sees per-source attempted/succeeded/partial/unavailable/blocked status, captured values and timestamps; draft creation/manual workflow still works offline. The orchestrator does not invent values or mark unavailable signals as checked. |
+| FR-016 | P0 | Provide tested source connectors for the critical listing-signal categories identified by the feasibility gate, prioritizing official category-wise subscription (QIB/NII/retail) and named unofficial GMP sources where free and permitted retrieval is feasible. | A representative Mainboard IPO test set records fields retrieved, source authority, timestamp quality, coverage, terms/cost and failures. If no compliant free route exists for a critical category, the product owner must explicitly resolve the scope trade-off before release; the requirement cannot be silently downgraded to manual-only.
 
 ### 8.3 Fact extraction and validation
 
@@ -234,19 +235,20 @@ Priority definitions: **P0** = required for MVP; **P1** = follow-on; **P2** = la
 | FR-030 | P0 | Calculate a defined set of core financial measures from validated inputs. | Each calculation uses a documented formula, input periods, units, rounding rule and automated test cases. |
 | FR-031 | P0 | Analyse offer structure, including fresh issue/OFS, intended use of proceeds, issue size, dilution and selling-supply considerations where data are disclosed. | The report separates disclosed facts from interpretation and lists unavailable fields. |
 | FR-032 | P0 | Assess selected earnings-quality signals, such as PAT versus operating cash flow, other income and one-off effects where the required data exist. | A finding includes its formula/rule and supporting inputs; unavailable inputs produce a limitation instead of a guess. |
-| FR-033 | P0 | Run initial cross-checks across selected financial, offer, governance and market indicators. | Every triggered rule produces an explainable finding and identifies its evidence/input records. |
+| FR-033 | P0 | Run initial cross-checks across company fundamentals, earnings quality, offer structure, governance, valuation and listing-demand/market signals. Explicitly include subscription demand (QIB/NII/retail) versus valuation/fundamentals, and GMP versus subscription, valuation, free-float/issue size and market context where the required inputs exist. | Every triggered rule explains the relationship, cites all input records and timestamps, preserves contrary evidence, and states missing/stale/conflicting prerequisites. It does not infer causation or double-count correlated signals. |
 | FR-034 | P1 | Add deeper sector-specific checks, related-party/dependency mapping and expanded valuation comparisons. | A check is applied only where relevant and its applicability rationale is recorded. |
 
 ### 8.5 Listing-day research and scenarios
 
 | ID | Priority | Requirement | Acceptance condition |
 |---|---|---|---|
-| FR-040 | P0 | Support manually entered market observations with source and timestamp, including subscription and GMP where available. | Each observation shows whether it is official or unofficial, its time and its provenance. |
+| FR-040 | P0 | Acquire supported market observations through approved source connectors where feasible, while allowing manual entry/import for every signal category, including QIB/NII/retail subscription and GMP. | Each observation preserves source, official/unofficial status, observed/publication/retrieval time, category/definition, freshness and provenance. Manual entry remains available when a connector fails or data are unavailable. |
 | FR-041 | P0 | Present user-defined listing-day price scenarios and downside where adequate inputs are available. | Each scenario records the assumed listing price or percentage change, reference issue price, information cutoff, assumptions and missing prerequisites; the report does not present user-entered scenarios as predictions. |
 | FR-042 | P0 | Calculate listing return conditional on allotment separately from allotment probability. | For a valid issue price and scenario price, the system calculates gross return percentage as (scenario price − issue price) / issue price and shows the formula and inputs. Per-share/lot profit is shown only when the applicable share/lot quantity is known. Allotment probability remains a separate field and is not inferred by the return calculation. |
 | FR-043 | P0 | Show uncertainty and material adverse scenarios alongside positive cases. | The report cannot show only an upside case when an applicable downside scenario is available. |
-| FR-044 | P1 | Provide time-series views for subscription/GMP and synchronize them with news and attention observations. | Different publication/retrieval times are retained; missing observations are not interpolated without a visible rule. |
+| FR-044 | P0 | Synchronize and compare available time-sensitive signals by their actual observation/publication time and the analysis information cutoff. Core cross-signal comparisons are part of the MVP; richer time-series visualizations can be staged after the initial source paths work. | Subscription/GMP/news/market observations are compared only when timing and definitions support the comparison; stale, missing, asynchronous or contradictory observations are explicitly flagged, and missing points are not silently interpolated. |
 | FR-045 | P2 | Evaluate historical listing outcomes and model calibration. | Any published performance claim is based on a documented, leakage-controlled evaluation. |
+| FR-046 | P0 | After IPO name entry, attempt supported issue/source discovery and show the user an acquisition status summary before final analysis. | Identity matches are confirmed or flagged as ambiguous; source attempts, last refresh, returned fields, missing categories and failures are visible. The user can retry or supply evidence manually. No specific provider is assumed until it passes the feasibility gate. |
 
 ### 8.6 News and attention signals
 
@@ -356,7 +358,7 @@ Exact performance targets and supported file-size limits will be set during tech
 
 The MVP is acceptable only when all P0 requirements are implemented and the following end-to-end criteria pass:
 
-- **AC-01 — Evidence-first case:** A user can create one IPO case, register the relevant offer documents and manually enter market observations.
+- **AC-01 — IPO discovery and evidence-first case:** A user can enter an IPO name, resolve/confirm the correct issue, see automated source-discovery/retrieval attempts for approved connectors, register documents, and manually enter any missing observations.
 - **AC-02 — Identity safety:** An ambiguous issuer/issue identity is flagged before a final report is produced.
 - **AC-03 — Reviewable extraction:** Candidate extracted facts show their source locator and can be accepted, corrected or rejected.
 - **AC-04 — Missingness:** Deliberately omitted critical inputs remain unavailable; they are not filled with zero or invented estimates.
@@ -368,7 +370,8 @@ The MVP is acceptable only when all P0 requirements are implemented and the foll
 - **AC-10 — Export integrity:** Exported output retains citations, limitations, data-quality indicators and scenario qualifications.
 - **AC-11 — Run history:** A subsequent run does not silently overwrite the source snapshot and report from a previous run.
 - **AC-12 — Offline/manual core:** With local files and manual inputs available, the core case, calculation and report workflow completes without an online data provider, paid API, or AI service.
-- **AC-13 — Failure handling:** Failure of optional source retrieval or AI extraction leaves original evidence intact and gives the user a clear message.
+- **AC-13 — Failure handling:** Failure of any source connector or optional AI extraction leaves original evidence intact, records the failed/unavailable source status, preserves last-known values with freshness labels, and gives the user a manual fallback.
+- **AC-15 — Signal acquisition feasibility gate:** Before MVP sign-off, the repository contains a dated benchmark test of approved candidate sources for IPO identity/offer terms, QIB/NII/retail subscription and named unofficial GMP, including coverage across representative Mainboard IPOs, fields/definitions, observed/retrieval timestamps, access terms/cost, failure cases and the decision for each source. A critical category with no free/permitted retrieval path requires an explicit product-owner decision; it cannot be silently described as a complete automatic workflow.
 - **AC-14 — No unsupported predictive claim:** No accuracy claim is shown unless a documented, leakage-controlled historical evaluation supports it.
 
 ## 14. Success metrics
@@ -499,7 +502,7 @@ A feature is not done merely because the screen or endpoint exists. A feature is
 
 ### Explicitly not approved as MVP requirements
 
-- Mandatory live news, Google Trends, GMP, subscription or exchange APIs.
+- Dependence on any single mandatory paid/unverified provider, always-online API or Google Trends feed; a compliant source-acquisition layer and core cross-signal analysis remain required, while individual connectors are approved only after feasibility testing.
 - Paid AI/API dependency or automatic document extraction as a prerequisite.
 - Automatic trading/order execution, public SaaS, multi-user accounts or cloud database.
 - A universal numeric IPO score or unvalidated probability of listing gain.
