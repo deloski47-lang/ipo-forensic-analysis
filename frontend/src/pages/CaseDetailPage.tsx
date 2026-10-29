@@ -7,6 +7,7 @@ import type { CaseDetail } from "../api/cases";
 import ObservationsPanel from "./ObservationsPanel";
 import ScenariosPanel from "./ScenariosPanel";
 import FactsPanel from "./FactsPanel";
+import AnalysisReportsPanel from "./AnalysisReportsPanel";
 
 export default function CaseDetailPage() {
   const { caseId = "" } = useParams();
@@ -170,5 +171,6 @@ export default function CaseDetailPage() {
     <FactsPanel caseId={caseId} evidence={evidence} />
     <ObservationsPanel caseId={caseId} evidence={evidence} />
     <ScenariosPanel caseId={caseId} />
+    <AnalysisReportsPanel caseId={caseId} identityConfirmed={researchCase.identityStatus === "confirmed"} />
   </main>;
 }
