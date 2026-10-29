@@ -17,7 +17,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.db import get_db, _engine_for_path
+from app.db import get_db, get_engine, _engine_for_path
 from app.models import ResearchCase, EvidenceItem, RestoreValidation
 from app.schemas.backups import BackupResponse, RestoreRequest, RestoreResponse, RestoreValidationResponse
 
@@ -281,10 +281,10 @@ def restore_backup(payload: RestoreRequest, db: Session = Depends(get_db)) -> Re
         if not staged_db.is_file():
             raise HTTPException(status_code=422, detail="Backup database file is missing.")
         db.commit()
+        engine = get_engine()
         db.close()
+        engine.dispose()
         _engine_for_path.cache_clear()
-        from app.db import get_engine
-        get_engine().dispose()
         shutil.copy2(settings.database_path, old_database)
         if (settings.data_dir / "evidence").exists():
             os.replace(settings.data_dir / "evidence", old_evidence)
