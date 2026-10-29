@@ -9,6 +9,7 @@ from app.api.routes.scenarios import router as scenarios_router
 from app.api.routes.facts import router as facts_router
 from app.api.routes.analysis import router as analysis_router
 from app.api.routes.reports import router as reports_router
+from app.api.routes.backups import router as backups_router
 
 api_router = APIRouter()
 api_router.include_router(health_router, tags=["health"])
@@ -20,3 +21,4 @@ api_router.include_router(scenarios_router, tags=["scenarios"])
 api_router.include_router(facts_router, tags=["facts"])
 api_router.include_router(analysis_router, tags=["analysis runs"])
 api_router.include_router(reports_router, tags=["reports"])
+api_router.include_router(backups_router, tags=["local data backup and restore"])
