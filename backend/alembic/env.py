@@ -1,4 +1,3 @@
-from logging.config import fileConfig
 from pathlib import Path
 
 from alembic import context
@@ -9,9 +8,6 @@ from app.db import Base
 from app import models  # noqa: F401 — register ORM tables with metadata
 
 config = context.config
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
-
 target_metadata = Base.metadata
 database_path = get_settings().database_path
 config.set_main_option("sqlalchemy.url", "sqlite:///" + str(database_path).replace(chr(92), "/"))
