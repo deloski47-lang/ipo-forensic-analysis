@@ -181,3 +181,7 @@ h2 { font-size: 23px; line-height: 1.2; letter-spacing: -.035em; margin-bottom: 
 .readiness-issue p { margin: 5px 0 0; }
 .readiness-blocker { background: #fff1ed; border: 1px solid #f1c7bc; }
 .readiness-warning { background: #fff7e8; border: 1px solid #ecd8ac; }
+
+.observations-panel { margin-top: 22px; }
+.observation-form { max-width: 760px; margin-bottom: 24px; }
+.observation-form select, .observation-form input, .observation-form textarea { font-size: 13px; }
