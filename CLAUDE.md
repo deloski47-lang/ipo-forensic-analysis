@@ -9,6 +9,7 @@ The detailed requirements and research references live in [docs/](docs/):
 - [Indicator Catalogue & Data Dictionary](docs/IPO_Indicator_Catalogue_and_Data_Dictionary_v1.0.md)
 - [Data Source & Feasibility Audit](docs/IPO_Data_Source_and_Feasibility_Audit_v1.0.md)
 - [Application Flow](docs/app-flow.md)
+- [UI/UX Design Specification](docs/design.md)
 - [Technical Design](docs/TECHNICAL_DESIGN.md)
 
 The linked existing Markdown files are the canonical sources for their content. Update them in place and preserve their full substance; do not create versioned duplicates for routine changes. The binding constraints are ₹0 total budget, Mainboard IPOs only, local-first/manual-first operation, no AI-invented values, and deterministic tested financial calculations.
