@@ -1,5 +1,4 @@
 import { apiGet, apiPost } from "./client";
-import type { AnalysisRunDetail } from "./analysis";
 
 export interface ReportSection {
   sectionCode: string; heading: string; bodyMarkdown: string;
