@@ -406,6 +406,16 @@ This is a **public-page/API-documentation screening**, not a claim that the JSON
 
 ### 17.5 Next required test to close the benchmark
 
+A read-only runner is now in the repository: [scripts/source_feasibility_smoke_test.py](../scripts/source_feasibility_smoke_test.py). It uses the Python standard library only, makes GET requests to the documented public candidate endpoints, records HTTP status/content type/latency/response hash/JSON validity, checks the ipos.markets category fields against the representative sample, and records the limited GMP feed and Xflot response. It does not scrape NSE pages, log in, or change application data. It includes a local 65-second Xflot polling guard.
+
+From the repository root in VS Code's terminal, run:
+
+```bash
+python scripts/source_feasibility_smoke_test.py --output source-feasibility-run.json
+```
+
+On Windows, `py scripts/source_feasibility_smoke_test.py --output source-feasibility-run.json` is also valid if the Python launcher is installed. The run report is a local test artifact; inspect it before deciding what evidence should be committed to the canonical audit. A failed request may reflect the network, DNS/TLS, or access environment and must not be mislabelled as proof that the provider's API is down.
+
 Before approving a connector, execute the following against all ten named issues from the application developer environment or another network environment that can reach the documented URLs:
 
 1. Call the provider's documented endpoint directly, record UTC start/end time, HTTP status, content type, response hash, latency, and parser result. Do not store secrets in the test log.
