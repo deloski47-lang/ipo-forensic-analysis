@@ -27,8 +27,9 @@ Read this file together with:
 2. **Approved PRD:** MVP scope, functional requirements, non-functional requirements and acceptance criteria.
 3. **Data Source & Feasibility Audit:** evidence hierarchy, source feasibility, access/usage constraints, source acceptance tests and manual fallbacks.
 4. **Indicator Catalogue & Data Dictionary:** indicator meanings, logical data-record semantics, formula and normalization standards, cross-indicator dependencies, claim/finding semantics and test expectations.
-5. **Database Schema:** [docs/database-schema.md](database-schema.md) defines the proposed v0.1 SQLite persistence entities, fields, constraints and indexes. Align it with the first Data Contract before implementing migrations.
-6. **AGENTS.md, CLAUDE.md and README.md:** repository rules and binding project constraints.
+5. **Implementation Blueprint & Data Contract:** [implementation-blueprint.md](implementation-blueprint.md) is the authority for exact P0 source file paths, ownership boundaries, frontend/backend stack, API routes, wire fields/enums, environment variables and build sequence.
+6. **Database Schema:** [database-schema.md](database-schema.md) defines the proposed SQLite persistence tables, fields, constraints and indexes and is now version 0.2. Implement/test migration 0001 before persistence-dependent features.
+7. **AGENTS.md, CLAUDE.md and README.md:** repository rules and binding project constraints.
 
 At present the detailed reference documents are stored in the repository under their versioned filenames within docs/. Preserve their contents and current history. Do not create replacement summaries or duplicate versions as part of this design.
 
@@ -340,92 +341,11 @@ If optional AI is added later:
 
 ## 7. Code repository and module map
 
-Use one repository for the frontend, backend, tests and canonical documents. Do not split the product into separate repositories in the MVP.
+Use one repository for frontend, backend, tests and canonical documents. Do not split the MVP into multiple repositories.
 
-The existing detailed source documents should keep their current filenames until a focused repository housekeeping change is approved. The following is a target layout for application code; do not create empty folders without an implemented responsibility.
+The exact P0 application file tree is maintained only in [Implementation Blueprint & Data Contract](implementation-blueprint.md), Section 4. That file is authoritative for filenames, folder paths, frontend routes/pages, backend route/schema/service/repository/domain modules, migration/test layout and which files are only planned for future phases. This Technical Design deliberately does not duplicate a second full tree: duplicated trees drift and would cause code agents to create incompatible structures.
 
-~~~text
-ipo-forensic-analysis/
-├── README.md
-├── AGENTS.md
-├── CLAUDE.md
-├── docs/
-│   ├── IPO_Forensic_Analysis_Project_Brief_v1.0.md
-│   ├── IPO_Forensic_Analysis_PRD_v1.0_APPROVED.md
-│   ├── IPO_Data_Source_and_Feasibility_Audit_v1.0.md
-│   ├── IPO_Indicator_Catalogue_and_Data_Dictionary_v1.0.md
-│   └── TECHNICAL_DESIGN.md
-├── frontend/
-│   └── src/
-│       ├── app/
-│       ├── components/
-│       ├── features/
-│       │   ├── cases/
-│       │   ├── evidence/
-│       │   ├── facts/
-│       │   ├── analysis/
-│       │   ├── findings/
-│       │   ├── scenarios/
-│       │   └── reports/
-│       ├── lib/
-│       │   └── api/
-│       ├── generated/
-│       │   └── api-types/
-│       └── styles/
-├── backend/
-│   ├── pyproject.toml
-│   ├── alembic.ini
-│   ├── migrations/
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── api/
-│   │   │   ├── router.py
-│   │   │   └── routes/
-│   │   ├── application/
-│   │   │   ├── cases/
-│   │   │   ├── evidence/
-│   │   │   ├── facts/
-│   │   │   ├── analysis/
-│   │   │   ├── reports/
-│   │   │   └── backup/
-│   │   ├── domain/
-│   │   │   ├── identity/
-│   │   │   ├── evidence/
-│   │   │   ├── facts/
-│   │   │   ├── indicators/
-│   │   │   ├── formulas/
-│   │   │   ├── findings/
-│   │   │   ├── scenarios/
-│   │   │   └── runs/
-│   │   ├── schemas/
-│   │   ├── persistence/
-│   │   │   ├── models/
-│   │   │   ├── repositories/
-│   │   │   └── database.py
-│   │   ├── ingestion/
-│   │   │   ├── file_registry.py
-│   │   │   ├── pdf_text.py
-│   │   │   └── candidate_extraction.py
-│   │   ├── rules/
-│   │   │   ├── cross_checks/
-│   │   │   └── sector_checks/
-│   │   ├── reporting/
-│   │   │   ├── report_builder.py
-│   │   │   ├── html/
-│   │   │   └── docx/
-│   │   ├── adapters/
-│   │   │   └── optional_sources/
-│   │   ├── ai/
-│   │   │   └── providers/
-│   │   └── config.py
-│   └── tests/
-│       ├── unit/
-│       ├── integration/
-│       ├── contract/
-│       └── fixtures/
-├── scripts/
-└── .env.example
-~~~
+The tree in the Blueprint is a phase-by-phase target, not a demand to create empty placeholders. Add each file when the feature it owns is implemented and tested. Do not invent a new Next.js/server-side-rendering structure; the frozen P0 frontend is React + TypeScript + Vite, with Python + FastAPI as the local API.
 
 ### 7.1 Structure rules
 
@@ -1518,7 +1438,7 @@ Project-specific evidence-source research stays in the Data Source & Feasibility
 - Vite does not type-check TypeScript by itself; a separate TypeScript check is required.
 - SQLite foreign-key declarations are not enforced unless the connection is configured accordingly; this is now an explicit setup and test requirement.
 - Local upload validation must check actual file content and size, not trust filename/Content-Type alone.
-- A proposed SQLite database schema is documented in docs/database-schema.md, but no migration or database runtime behaviour has been claimed as implemented or tested. Exact endpoint payloads, formula register, supported PDF matrix and provider-specific adapters remain unimplemented or unverified.
+- A proposed SQLite database schema v0.2 is documented in docs/database-schema.md, but no migration or database runtime behaviour has been claimed as implemented or tested. Exact endpoint payloads, formula register, supported PDF matrix and provider-specific adapters remain unimplemented or unverified.
 
 **Cross-document scope check:** completed. The existing PRD, Data Source & Feasibility Audit, Project Brief and Indicator Catalogue now state Mainboard-only coverage and the ₹0 constraint. Agent instructions and README links were also corrected in place.
 
@@ -1542,3 +1462,6 @@ Still open for implementation validation—not speculative renaming:
 - provider-specific terms/coverage approval and any critical free/permitted-source gap.
 
 No application code, contract test, migration or source adapter is implied to have passed merely because the specification is now fixed.
+
+
+The canonical implementation file tree and P0 API contract live in docs/implementation-blueprint.md. Older diagrams/listings in this Technical Design are explanatory context only and must not be used to generate a competing tree or API payloads.
