@@ -53,7 +53,7 @@ The working application changes are being built on a review branch from the scaf
     pip install -e ".[dev]"
     uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
-The API applies checked-in Alembic migrations at startup, stores research cases in the per-user SQLite database, and exposes GET/POST /api/v1/cases plus case reopen, rename, and archive routes.
+The API applies checked-in Alembic migrations at startup, stores research cases and evidence in the per-user SQLite database, supports evidence-backed manual Mainboard identity confirmation, local PDF upload with SHA-256 integrity hashes, human evidence review, and analysis-readiness diagnostics. It exposes case create/list/reopen/rename/archive endpoints. No automated source connectors or financial formula registry is enabled yet.
 
 ### Start the frontend (a second terminal)
 
