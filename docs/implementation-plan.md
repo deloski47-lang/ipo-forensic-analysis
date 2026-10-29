@@ -280,15 +280,16 @@ Every data-backed view needs loading, empty, validation, failure, partial, stale
 
 ## 10. Decisions still open (do not silently invent)
 
-- Final first-slice Data Contract and exact enums/property names.
-- Final schema adjustments and migration mechanism after validating the recommended SQLAlchemy/Alembic setup.
 - Initial P0 formula/rule register and independently checked golden fixtures.
-- File types/size limits and representative PDF extraction coverage; manual entry remains fully supported.
-- First report export: DOCX is the recommendation; PDF depends on a tested offline path.
-- Local data directory, backup/restore behaviour and supported operating systems.
+- Align the current proposed schema to docs/implementation-blueprint.md, then validate SQLAlchemy/Alembic migration 0001, foreign keys and restart persistence.
+- Representative PDF parsing coverage and whether the 25 MiB default upload limit is sufficient; manual entry remains fully supported.
+- Offline HTML preview/DOCX export tests, including preservation of provenance and limitations. PDF remains deferred until a free offline path is proven.
+- Backup/restore acceptance tests in a disposable data directory and verification that the platform-specific default data path works on the target machine.
 - Exact hero component URL/code and screen placement, supplied by the product owner.
 - Provider rights/terms and the enablement of each individual adapter.
-- Any critical source category that remains without a free/permitted route after validation; requires an explicit product-owner release decision.
+- Any critical source category that remains without a free/permitted route after validation; this requires an explicit product-owner release decision.
+
+The P0 API routes, JSON fields, enums, target file tree and runtime configuration are already frozen in docs/implementation-blueprint.md. Do not reopen them casually or write a competing contract. Update that file deliberately if an implementation test reveals a real incompatibility.
 
 Do not let future P1/P2 choices block the scaffold or provider-neutral/manual-first vertical slice. Do block the affected feature when its missing decision would make it unsafe or untestable.
 
