@@ -57,7 +57,7 @@ From the repository root, run `.\\scripts\\start-dev.ps1`. For manual setup, use
     pip install -e ".[dev]"
     uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
-The API applies checked-in Alembic migrations at startup, stores research cases and evidence in the per-user SQLite database, supports evidence-backed manual Mainboard identity confirmation, local PDF upload with SHA-256 integrity hashes, human evidence review, manual evidence-linked facts and listing-signal observations with indicator-catalogue IDs and explicit human review, Decimal-based gross listing-scenario calculations, and analysis-readiness diagnostics. It exposes case create/list/reopen/rename/archive endpoints. No automated source connectors or financial formula registry is enabled yet.
+The API applies checked-in Alembic migrations at startup, stores research cases and evidence in the per-user SQLite database, supports evidence-backed manual Mainboard identity confirmation, local PDF upload with SHA-256 integrity hashes, human evidence review, manual evidence-linked facts and listing-signal observations with indicator-catalogue IDs and explicit human review, Decimal-based gross listing-scenario calculations, analysis-readiness diagnostics, partial immutable analysis runs for saved scenario gross returns, and immutable report snapshots with offline HTML/DOCX exports. It exposes case create/list/reopen/rename/archive endpoints. No automated source connectors or financial formula registry is enabled yet.
 
 ### Start the frontend (a second terminal)
 
