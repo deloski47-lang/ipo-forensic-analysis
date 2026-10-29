@@ -1071,13 +1071,17 @@ This mapping ensures the flow covers approved requirements instead of becoming a
 | FR-031 — offer structure | RUN-01, REPT-01 | Disclosed facts are separate from interpretations; unavailable fields are listed. |
 | FR-032 — earnings quality | RUN-01, REPT-01 | Findings contain formula/rule and inputs, or state the limitation. |
 | FR-033 — initial cross-checks | ANAL-01, RUN-01 | Triggered rules explain the relationship and identify supporting inputs. |
+| FR-034 — deeper sector-specific checks (P1) | Deferred/P1; RUN-01 when implemented | Checks are applied only when appropriate and explain their applicability; not required for the P0 flow. |
 | FR-040 — manual time-sensitive observations | EVID-01, FACT-01, SCEN-01 | Source, time and official/unofficial status are displayed. |
 | FR-041 — user-defined scenarios | SCEN-01 | Assumptions, reference price, cutoff and missing prerequisites are clear. |
 | FR-042 — return conditional on allotment | SCEN-01 | Known-answer return test; no conflation with allotment probability. |
 | FR-043 — uncertainty/adverse scenarios | SCEN-01, REPT-01 | Relevant downside is not hidden when adequate inputs exist. |
 | FR-044 — later synchronized time series | Deferred/P1 | No requirement for a P0 automated time series. |
 | FR-045 — historical outcomes/model calibration | Deferred/P2 | Must be leakage-controlled before any predictive claim. |
-| FR-050–FR-053 — news/attention | Deferred/P1/P2, EVID-01 where manual registration applies | Never required to complete core MVP. |
+| FR-050 — record news items (P1) | EVID-01 and deferred news flow | If implemented, retain publisher, URL, publication/event/retrieval time and verification status; manual source registration remains available. |
+| FR-051 — duplicate/syndicated story handling (P1) | Deferred/P1 | If implemented, repeated coverage must not be presented as independent corroboration; it is not a P0 dependency. |
+| FR-052 — news classification (P1) | Deferred/P1 | If implemented, distinguish official fact, reporting, allegation, opinion and unverified claim; sentiment alone never verifies a claim. |
+| FR-053 — search attention/Google Trends (P2) | Deferred/P2 | Only consider after access and value are evaluated; absence never blocks the core MVP. |
 | FR-060 — structured qualified report | REPT-01 | Report states evidence sufficiency, limitations and qualified assessment. |
 | FR-061 — citations/calculation traces | RUN-01, REPT-01 | Citation validation catches missing/unresolved references before export. |
 | FR-062 — cutoff/run/formula versions | ANAL-01, RUN-01, REPT-01 | Report links to the exact saved run and cutoff. |
