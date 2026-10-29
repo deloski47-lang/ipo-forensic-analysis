@@ -63,6 +63,6 @@ describe("research cases workspace", () => {
       (init as RequestInit | undefined)?.method === "POST" &&
       (init as RequestInit | undefined)?.body === JSON.stringify({ enteredName: "New Mainboard IPO" })
     )).toBe(true));
-    expect(await screen.findByText("New Mainboard IPO")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "New Mainboard IPO" })).toBeInTheDocument();
   });
 });
