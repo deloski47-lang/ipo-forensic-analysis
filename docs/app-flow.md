@@ -273,7 +273,7 @@ Provide a reliable starting point for creating a new case or reopening existing 
 
 ### Purpose
 
-Create a saved case without assuming that the user has a ticker, a complete issue record or API access.
+Create a saved case without assuming that the user has a ticker or complete issue record. After a likely issue is identified, initiate acquisition using reviewed/approved source connectors; do not assume that every source has a free API or is retrievable.
 
 ### Inputs
 
@@ -290,10 +290,12 @@ Exact field names and the final validation schema belong in the Data Contract. D
 2. User enters the known name and any optional identifiers.
 3. Input is validated for basic completeness and length.
 4. The system creates a draft/research case with identity status reflecting what is actually known.
-5. Identity is resolved/confirmed using evidence available in the app; automatic live lookup is not required.
-6. If there are multiple plausible issues or the issue is not yet confirmed, the case remains identity-unresolved.
-7. User may register evidence to help resolve the correct issue.
-8. The app clearly indicates whether full analysis is currently blocked by identity uncertainty.
+5. The app attempts issue discovery using approved sources/connectors and presents candidate matches with supporting identifiers and provenance. Do not assume a universal free search API exists.
+6. If there are multiple plausible issues or the issue is not yet confirmed, the case remains identity-unresolved; do not attach fetched observations to an uncertain issue or run final analysis.
+7. Once identity is confirmed, the core acquisition orchestrator attempts retrieval from enabled/approved connectors for the critical signal categories they support, including official category subscription (QIB/NII/retail) and named unofficial GMP sources where a compliant route has been verified.
+8. The app records and displays which sources were attempted, which fields were returned, source and observed/publication/retrieval times, freshness, partial coverage and failures/unavailable/blocked categories. A failed attempt is not represented as a successful check.
+9. User may register supporting documents, retry a connector, import data or enter an observation manually where any signal is unavailable. Saving and manual research must remain usable offline.
+10. The app clearly indicates whether full or partial analysis is currently blocked by identity uncertainty, unavailable sources, stale observations or missing evidence.
 
 ### Mainboard-only behaviour
 
@@ -338,6 +340,7 @@ Show the state of a particular case and provide a clear route to the next useful
 
 - Confirmed issue name and available identifying details.
 - Identity state and the basis/source used to confirm it.
+- Source-acquisition summary: connector status, last attempt/refresh, returned fields, partial coverage, freshness, unavailable/blocked categories and actionable retry/manual fallback.
 - Summary of registered evidence and missing expected evidence.
 - Fact review summary: candidates to review, unverified facts, conflicts, stale items and missing inputs.
 - Last completed analysis run and report, if any.
@@ -353,12 +356,13 @@ Readiness is not a single confidence score. Show concrete items:
 - Candidate values awaiting review.
 - Conflicts needing resolution or explicitly left unresolved.
 - Formula prerequisites missing/invalid.
+- Acquisition status for relevant signal categories: latest attempt, freshness, source coverage, unavailable/blocked connector and manual fallback.
 - Analysis can run partially, or final assessment is blocked for a stated reason.
 - Report availability and freshness relative to the current case.
 
 ### Required behaviours
 
-- Refresh the overview from saved state; do not run analysis implicitly.
+- Refresh the overview from saved state; do not run analysis implicitly. Source acquisition runs only from an explicit supported action or the defined post-identity-confirmation flow, never as a hidden side effect of opening the overview.
 - Every warning should navigate to the relevant review screen where possible.
 - A section marked “complete” must be based on persisted data/status, not only frontend-local state.
 - Distinguish “not started” from “failed to load”.
@@ -368,8 +372,10 @@ Readiness is not a single confidence score. Show concrete items:
 
 - User can understand the current case state without opening every screen.
 - All blockers link to a specific next action.
-- Reopening the case displays persisted evidence and run history.
+- Reopening the case displays persisted evidence, acquisition-attempt history and run history.
 - A failed API call never displays a falsely complete readiness summary.
+- The user can distinguish a successfully checked source with no relevant value from a source that was not attempted, was blocked, failed or returned partial data.
+- The UI exposes manual entry/import when a relevant approved source is unavailable.
 
 ---
 
@@ -828,9 +834,10 @@ flowchart TD
     D --> E
     E -- No --> F[Resolve identity or register evidence]
     F --> E
-    E -- Yes --> G[Review case overview]
-    G --> H[Register sources and documents]
-    H --> I[Enter/review facts and observations]
+    E -- Yes --> F2[Attempt approved source acquisition]
+    F2 --> G[Review case and acquisition status]
+    G --> H[Register sources and documents or supplement missing signals]
+    H --> I[Review retrieved candidates and enter/review facts]
     I --> J[Resolve or explicitly retain conflicts]
     J --> K[Check analysis readiness]
     K --> L{Run prerequisites met?}
@@ -1061,7 +1068,7 @@ This mapping ensures the flow covers approved requirements instead of becoming a
 | FR-012 — preserve original/version | EVID-01 | Same-name/version uploads do not rewrite evidence used by old reports. |
 | FR-013 — coverage and missing expected evidence | CASE-02, EVID-01, REPT-01 | Missing evidence is visible and the expectation basis is explainable. |
 | FR-014 — conflict handling | FACT-01, ANAL-01, RUN-01 | Conflicts remain visible with sources and resolution status. |
-| FR-015 — future adapters | EVID-01, section 8 | Adapter failures fall back to manual entry; source approval remains gated. |
+| FR-015 — core acquisition orchestrator and approved connectors | CASE-01, CASE-02, section 8 | After identity confirmation, supported connectors are attempted; per-source outcomes/fields/timestamps/limitations persist; failures fall back to manual entry. |
 | FR-020 — fact semantics | FACT-01, section 10 | Values have unit/period/source/method/status or visible unknowns. |
 | FR-021 — candidate review | FACT-01 | Candidate can be accepted/corrected/rejected/unresolved; manual entry remains. |
 | FR-022 — missingness states | All data screens, especially FACT-01 and ANAL-01 | Missing/stale/conflicting/unverified/invalid/N/A remain distinct. |
@@ -1072,12 +1079,14 @@ This mapping ensures the flow covers approved requirements instead of becoming a
 | FR-032 — earnings quality | RUN-01, REPT-01 | Findings contain formula/rule and inputs, or state the limitation. |
 | FR-033 — initial cross-checks | ANAL-01, RUN-01 | Triggered rules explain the relationship and identify supporting inputs. |
 | FR-034 — deeper sector-specific checks (P1) | Deferred/P1; RUN-01 when implemented | Checks are applied only when appropriate and explain their applicability; not required for the P0 flow. |
-| FR-040 — manual time-sensitive observations | EVID-01, FACT-01, SCEN-01 | Source, time and official/unofficial status are displayed. |
+| FR-016 — critical-signal connector feasibility and coverage | CASE-01, CASE-02, section 8, section 13 | A dated representative-IPO source benchmark records field coverage, permissions/terms, cost, timestamp quality and failures; unresolved critical gaps require explicit scope resolution before release. |
+| FR-040 — acquired and manually supplied time-sensitive observations | CASE-02, EVID-01, FACT-01, SCEN-01 | Source, time, status, freshness and provenance are displayed for both retrieved and manual observations. |
 | FR-041 — user-defined scenarios | SCEN-01 | Assumptions, reference price, cutoff and missing prerequisites are clear. |
 | FR-042 — return conditional on allotment | SCEN-01 | Known-answer return test; no conflation with allotment probability. |
 | FR-043 — uncertainty/adverse scenarios | SCEN-01, REPT-01 | Relevant downside is not hidden when adequate inputs exist. |
-| FR-044 — later synchronized time series | Deferred/P1 | No requirement for a P0 automated time series. |
+| FR-044 — synchronize available time-sensitive signals | CASE-02, FACT-01, ANAL-01, RUN-01 | Core signal comparisons use compatible timestamps/cutoffs and flag stale/asynchronous/missing data. Richer time-series visualizations can be staged, but core interconnection is P0. |
 | FR-045 — historical outcomes/model calibration | Deferred/P2 | Must be leakage-controlled before any predictive claim. |
+| FR-046 — IPO-name-triggered acquisition summary | CASE-01, CASE-02 | User sees candidate identity, acquisition attempts and per-source outcomes; ambiguity must be resolved, and failed/unavailable source states remain explicit. |
 | FR-050 — record news items (P1) | EVID-01 and deferred news flow | If implemented, retain publisher, URL, publication/event/retrieval time and verification status; manual source registration remains available. |
 | FR-051 — duplicate/syndicated story handling (P1) | Deferred/P1 | If implemented, repeated coverage must not be presented as independent corroboration; it is not a P0 dependency. |
 | FR-052 — news classification (P1) | Deferred/P1 | If implemented, distinguish official fact, reporting, allegation, opinion and unverified claim; sentiment alone never verifies a claim. |
@@ -1279,14 +1288,15 @@ The product must not block all coding while every future/P1/P2 choice is decided
 - Enter user-defined listing-day price scenarios and calculate supported gross-return arithmetic.
 - Generate, preview, export and retain a structured report with citations/limitations.
 - Preserve prior runs/reports and reopen a case.
-- Work without any required live API, AI API or paid service.
+- Keep manual data entry, local calculations and reporting usable without internet, AI APIs or paid services. The intended online workflow also attempts acquisition through approved connectors; no source is claimed operational without feasibility evidence.
+- From a confirmed IPO identity, expose retrieved/unavailable signal coverage and interconnect available fundamentals, valuation, QIB/NII/retail subscription, GMP and market/company-event inputs.
 
-### P1 — later, only after P0 works
+### P1 — expanded coverage after the core path works
 
-- Automatic adapters for verified useful data sources.
-- News registration/enrichment and deduplication/classification beyond manual source registration.
-- Time-series views for subscription/GMP with synchronized timestamps.
-- Deeper sector-specific rules and richer dependency mapping.
+- Additional connector coverage beyond the critical source categories; broader historical and multi-provider history.
+- Richer event/news discovery, deduplication and classification where compliant coverage is verified.
+- More expansive time-series visualizations; timestamp-aligned core comparisons are already P0.
+- Deeper sector-specific rules and a broader dependency graph.
 - Improved extraction and local OCR after representative accuracy testing.
 
 ### P2 — later/conditional
@@ -1323,16 +1333,17 @@ A screen or journey is complete only when:
 Build only the current phase's working path; do not create all screens at once.
 
 1. **Shell and case list:** local app startup, health status, error handling, create/open case route.
-2. **Case identity:** stable case, issue identity fields and ambiguity/out-of-scope state.
-3. **Evidence registry:** original file preservation, source metadata and manual registration.
-4. **Manual facts/review:** units, periods, source links, validation states and conflicts.
-5. **First Data Contract and persistence schema:** finalize for the flows/entities used by this vertical slice, not for every hypothetical future endpoint.
-6. **Formula register:** approve a small P0 set and independent test fixtures.
-7. **Analysis preflight and run:** deterministic results with saved snapshot, diagnostics and run history.
-8. **Finding review:** source/input links, explanations and unresolved states.
-9. **Scenarios:** user-defined inputs and tested gross return.
-10. **Report model and export:** HTML preview plus the approved/export-tested format.
-11. **Backup/restore and end-to-end reliability:** validate recovery before real data becomes irreplaceable.
+2. **Issue identity and source benchmark:** stable issue identity plus a dated benchmark for candidate subscription, GMP and official event/disclosure routes.
+3. **Source registry and acquisition orchestrator:** approved connector interface, attempt/result/status history, timestamps, coverage/freshness diagnostics, and safe failure handling.
+4. **Evidence registry and manual fallback:** original-file preservation, source metadata, uploads/import and manual observations.
+5. **Manual facts/review and candidate acquisition review:** units, periods, source links, validation states, conflicts, and review/verification of retrieved candidate values.
+6. **First Data Contract and persistence schema:** finalize for this vertical slice, including acquisition attempts and time-stamped observations.
+7. **Formula register and cross-signal rules:** approve a small P0 set with independent fixtures; include subscription/GMP-versus-valuation/fundamentals/market context relationships where inputs exist.
+8. **Analysis preflight and run:** deterministic results with saved snapshot, acquisition diagnostics and run history.
+9. **Finding review:** source/input links, cross-signal explanations and unresolved states.
+10. **Scenarios:** user-defined inputs and tested gross return.
+11. **Report model and export:** HTML preview plus the approved/export-tested format.
+12. **Backup/restore and end-to-end reliability:** validate recovery before real data becomes irreplaceable.
 
 A phase is not complete merely because its route or screen exists; it must pass its defined acceptance checks.
 
@@ -1380,10 +1391,11 @@ Any agent implementing the app flow must:
 
 Before the Data Contract and full screen implementation begin, review:
 
-- [ ] Case creation and identity-resolution behaviour.
+- [ ] Case creation, approved source discovery, identity-resolution and post-confirmation acquisition behaviour.
 - [ ] Mainboard-only enforcement and SME out-of-scope state.
 - [ ] Case workspace navigation and persisted status.
 - [ ] Evidence registration, original-file preservation and source metadata.
+- [ ] Source acquisition result/history, per-source status, timestamp/freshness display and manual fallback.
 - [ ] Manual facts, optional extraction review and conflict workflow.
 - [ ] Analysis preflight, cutoff and blocked/qualified execution semantics.
 - [ ] Analysis run/history immutability.
