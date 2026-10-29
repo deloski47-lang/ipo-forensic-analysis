@@ -217,22 +217,18 @@ def ipos_markets_test(max_issues: int) -> dict[str, Any]:
                 "manifest_record": {k: brief.get(k) for k in ("name", "symbol", "slug", "board", "status", "as_of", "path")},
             })
             continue
-        detail_url = brief.get("path")
-        if isinstance(detail_url, str) and detail_url.strip():
-            if detail_url.startswith("/"):
-                detail_url = "https://ipos.markets" + detail_url
-            elif not detail_url.startswith("http"):
-                detail_url = "https://ipos.markets/api/v1/subscription/" + urllib.parse.quote(detail_url, safe="")
-        else:
-            lookup = brief.get("symbol") or brief.get("bse") or brief.get("slug")
-            if not lookup:
-                details.append({
-                    "target": target,
-                    "candidate_status": "NO_LOOKUP_KEY",
-                    "manifest_record": {k: brief.get(k) for k in ("name", "symbol", "slug", "board", "status", "as_of")},
-                })
-                continue
-            detail_url = IPOS_INDEX_URL + "?" + urllib.parse.urlencode({"symbol": lookup})
+        # Use the documented query parameter, rather than following a path
+        # supplied by the remote manifest. This keeps requests on the provider
+        # origin and matches the publisher's published quick-start example.
+        lookup = brief.get("symbol") or brief.get("bse") or brief.get("slug")
+        if not lookup:
+            details.append({
+                "target": target,
+                "candidate_status": "NO_LOOKUP_KEY",
+                "manifest_record": {k: brief.get(k) for k in ("name", "symbol", "slug", "board", "status", "as_of")},
+            })
+            continue
+        detail_url = IPOS_INDEX_URL + "?" + urllib.parse.urlencode({"symbol": lookup})
 
         response = request_json(detail_url)
         record = response.get("data")
