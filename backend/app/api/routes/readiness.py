@@ -54,14 +54,14 @@ def get_analysis_readiness(
             message="No evidence is registered for this case.",
             next_action="Add official offer documents or source-backed manual evidence.",
         ))
-    elif not any(item.evidence_kind == "uploaded_document" for item in evidence):
+    elif not any(item.evidence_kind == "document" for item in evidence):
         warnings.append(ReadinessIssue(
             code="NO_OFFER_DOCUMENT_UPLOADED",
             severity="warning",
             message="No local offer-document PDF is registered.",
             next_action="Upload the RHP/prospectus or another relevant PDF if available.",
         ))
-    if not any(item.verification_status == "user_verified" for item in evidence):
+    if not any(item.verification_status == "reviewed" for item in evidence):
         blockers.append(ReadinessIssue(
             code="NO_USER_VERIFIED_EVIDENCE",
             severity="blocker",
