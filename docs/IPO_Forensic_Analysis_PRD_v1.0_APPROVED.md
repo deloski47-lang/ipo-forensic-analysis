@@ -6,16 +6,18 @@
 **Status:** Approved MVP scope baseline — technical and data-source decisions remain open  
 **Last updated:** 29 October 2026  
 **Product mode:** Local-first, single-user research application  
-**Primary market:** Indian IPOs  
+**Primary market:** Indian Mainboard IPOs  
 **Primary use case:** Evidence-based research for a possible listing-day exit
 
 > **Document purpose:** Define what the first useful version of the IPO Forensic Analysis Engine must do, how success will be judged, and what is deliberately outside scope. This document locks the product scope and expected behaviour for the MVP; it does not lock the technology stack, database schema, document extraction method, or external data providers. Approval of this PRD is not approval of technical design or a claim that all data sources are feasible.
+
+> **Binding scope clarification (29 October 2026):** The MVP is limited to Indian Mainboard IPOs; SME IPOs are out of scope. The total project budget is ₹0. No paid APIs, datasets, AI services, hosting, software upgrades, or paid fallbacks are permitted. The core workflow must remain local-first and manual-first. This explicit decision supersedes any broader reading of “Indian IPOs” elsewhere in this document.
 
 ---
 
 ## 1. Executive summary
 
-The IPO Forensic Analysis Engine is a local-first research application for analysing Indian IPOs, with particular emphasis on the risks and possible returns of a listing-day exit. It should help one user assemble evidence, validate facts, examine the issuer's business and financial risks, compare market signals, detect contradictions, and produce an auditable report.
+The IPO Forensic Analysis Engine is a local-first research application for analysing Indian Mainboard IPOs, with particular emphasis on the risks and possible returns of a listing-day exit. It should help one user assemble evidence, validate facts, examine the issuer's business and financial risks, compare market signals, detect contradictions, and produce an auditable report.
 
 The product is not intended to be a generic IPO listing page, a promotional summary generator, an automated trading system, or a machine that promises listing gains. Its output should be a structured, source-cited research report that makes evidence gaps, conflicts, assumptions, scenarios, and uncertainty visible.
 
@@ -52,6 +54,7 @@ The application should behave like a skeptical research analyst: it must try to 
 - **Uncertainty is explicit.** Separate facts, calculated metrics, interpretations, hypotheses and scenarios.
 - **No guaranteed outcomes.** Listing-day results are uncertain. The product must not imply that a scenario or score is a reliable probability unless validated appropriately.
 - **Local-first and cost-aware.** The first release should work locally without requiring paid APIs, cloud hosting or a cloud database.
+- **Fixed scope and zero budget.** Cover Indian Mainboard IPOs only; do not implement SME IPO support. The total budget is ₹0; no paid API, dataset, AI, hosting, software upgrade or paid fallback may be introduced.
 - **Manual fallback.** A source integration failure must not silently block the user from supplying a documented value or file.
 - **No look-ahead leakage.** Any historical evaluation must use only information available at the simulated decision timestamp.
 
@@ -59,7 +62,7 @@ The application should behave like a skeptical research analyst: it must try to 
 
 ### 4.1 Primary user
 
-One individual researching Indian IPOs for personal decision support, with a limited initial budget and a preference for local operation and transparent reasoning.
+One individual researching Indian Mainboard IPOs for personal decision support, with a limited initial budget and a preference for local operation and transparent reasoning.
 
 ### 4.2 User needs
 
