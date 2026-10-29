@@ -172,3 +172,65 @@ class FactRecord(Base):
     reviewed_at: Mapped[str | None] = mapped_column(String(40), nullable=True)
     review_rationale: Mapped[str | None] = mapped_column(String(2000), nullable=True)
     supersedes_fact_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+
+
+class AnalysisRun(Base):
+    __tablename__ = "analysis_runs"
+    __table_args__ = (
+        CheckConstraint("run_status IN ('completed', 'partial', 'failed')", name="ck_analysis_runs_status"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    case_id: Mapped[str] = mapped_column(String(36), ForeignKey("research_cases.id"), nullable=False, index=True)
+    run_status: Mapped[str] = mapped_column(String(16), nullable=False, default="partial")
+    information_cutoff_at: Mapped[str] = mapped_column(String(40), nullable=False)
+    started_at: Mapped[str] = mapped_column(String(40), nullable=False)
+    finished_at: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    schema_version: Mapped[str] = mapped_column(String(24), nullable=False)
+    formula_set_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    rule_set_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    software_version: Mapped[str] = mapped_column(String(24), nullable=False)
+    input_snapshot_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    input_snapshot_json: Mapped[str] = mapped_column(String, nullable=False)
+    readiness_json: Mapped[str] = mapped_column(String, nullable=False)
+    error_summary: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+
+
+class AnalysisResult(Base):
+    __tablename__ = "analysis_results"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    analysis_run_id: Mapped[str] = mapped_column(String(36), ForeignKey("analysis_runs.id"), nullable=False, index=True)
+    indicator_code: Mapped[str] = mapped_column(String(16), nullable=False)
+    calculation_status: Mapped[str] = mapped_column(String(24), nullable=False)
+    value_decimal: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    value_text: Mapped[str | None] = mapped_column(String(5000), nullable=True)
+    unit: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    currency: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    display_value: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    formula_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    formula_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    input_fact_ids_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
+    input_observation_ids_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
+    evidence_ids_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
+    explanation: Mapped[str] = mapped_column(String(5000), nullable=False)
+    reason: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+
+
+class Finding(Base):
+    __tablename__ = "findings"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    analysis_run_id: Mapped[str] = mapped_column(String(36), ForeignKey("analysis_runs.id"), nullable=False, index=True)
+    rule_code: Mapped[str] = mapped_column(String(64), nullable=False)
+    rule_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    finding_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    severity: Mapped[str] = mapped_column(String(16), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="active")
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    explanation: Mapped[str] = mapped_column(String(5000), nullable=False)
+    limitation_note: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    related_indicator_codes_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
+    input_fact_ids_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
+    input_observation_ids_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
+    evidence_links_json: Mapped[str] = mapped_column(String, nullable=False, default="[]")
