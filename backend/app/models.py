@@ -65,3 +65,33 @@ class EvidenceItem(Base):
     verification_status: Mapped[str] = mapped_column(String(24), nullable=False, default="unverified")
     notes: Mapped[str | None] = mapped_column(String, nullable=True)
     local_relative_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
+
+class Issuer(Base):
+    __tablename__ = "issuers"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    legal_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    created_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now)
+    updated_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now, onupdate=utc_now)
+
+
+class IpoIssue(Base):
+    __tablename__ = "ipo_issues"
+    __table_args__ = (
+        CheckConstraint("market_segment = 'MAINBOARD'", name="ck_ipo_issues_mainboard_only"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    issuer_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    display_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    market_segment: Mapped[str] = mapped_column(String(16), nullable=False, default="MAINBOARD")
+    open_date: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    close_date: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    listing_date: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    price_band_low: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    price_band_high: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    issue_size_amount: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    issue_size_unit: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now)
+    updated_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now, onupdate=utc_now)
