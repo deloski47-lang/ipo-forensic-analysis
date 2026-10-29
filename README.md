@@ -34,9 +34,9 @@ The repository Markdown files are the source of truth. Update the existing file 
 The project requirements, evidence-source baseline, application flow, UI/UX design, technical architecture, proposed SQLite schema, and implementation plan are recorded in the canonical Markdown documents. The [Implementation Blueprint & Data Contract](docs/implementation-blueprint.md) now fixes the P0 frontend/backend stack, target file tree, API paths, JSON fields, nullability, enums, error envelope, configuration variables, local storage layout and build gates. These are specifications, not evidence that the application has been implemented or tested. Before feature development, validate the local scaffold, align docs/database-schema.md and migration 0001 with the blueprint, approve the initial P0 formula register and define representative fixtures. Implementation must work without paid services, a single external provider or AI. Source-acquisition orchestration and interconnection of available fundamentals, valuation, QIB/NII/retail subscription and GMP signals remain required; connectors need dated feasibility evidence before enablement.
 
 
-## Local development — Phase 0 scaffold
+## Local development
 
-The working scaffold is being built on branch build/phase-0-scaffold. It is not merged into main yet.
+The working application changes are being built on a review branch from the scaffold. Review the active pull request before merging.
 
 ### Prerequisites
 
@@ -53,7 +53,7 @@ The working scaffold is being built on branch build/phase-0-scaffold. It is not 
     pip install -e ".[dev]"
     uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
-The initial GET /api/v1/health endpoint should respond. It intentionally reports the database as not initialized until the schema/migration milestone is implemented.
+The API applies checked-in Alembic migrations at startup, stores research cases in the per-user SQLite database, and exposes GET/POST /api/v1/cases plus case reopen, rename, and archive routes.
 
 ### Start the frontend (a second terminal)
 
