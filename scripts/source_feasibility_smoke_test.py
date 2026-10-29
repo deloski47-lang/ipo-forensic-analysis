@@ -385,6 +385,12 @@ def xflot_test(slug: str | None, force: bool = False) -> dict[str, Any]:
         ipo = data.get("ipo") if isinstance(data.get("ipo"), dict) else data
         subs = ipo.get("subs") if isinstance(ipo, dict) else None
         gmp = ipo.get("gmp") if isinstance(ipo, dict) else None
+        if not isinstance(subs, list):
+            subscription_coverage = "SUBSCRIPTION_ROWS_NOT_RETURNED"
+        elif not subs:
+            subscription_coverage = "NO_SUBSCRIPTION_ROWS_RETURNED"
+        else:
+            subscription_coverage = "SUBSCRIPTION_ROWS_RETURNED_UNVALIDATED"
         return {
             "provider": "Xflot",
             "mode": mode,
@@ -406,8 +412,9 @@ def xflot_test(slug: str | None, force: bool = False) -> dict[str, Any]:
                 "gmpDisputed": ipo.get("gmpDisputed"),
             } if isinstance(ipo, dict) else None,
             "subscription_rows": subs if isinstance(subs, list) else None,
+            "subscription_coverage": subscription_coverage,
             "gmp_history_count": len(gmp) if isinstance(gmp, list) else None,
-            "warning": "Detail response is source-reported data; inspect timestamps, board and discrepancies before use.",
+            "warning": "Detail response is source-reported data. Do not use it for subscription data unless category rows are returned and then independently validated; inspect timestamps, board and discrepancies before use.",
         }
 
     ipos = data.get("ipos")
@@ -484,7 +491,7 @@ def main() -> int:
     max_issues = max(1, min(args.max_issues, 10))
     report: dict[str, Any] = {
         "benchmark": "IPO Forensic Analysis Engine source API smoke test",
-        "script_version": "0.1",
+        "script_version": "0.2",
         "started_at_utc": utc_now(),
         "scope": "Indian Mainboard IPO subscription and unofficial GMP data",
         "budget": "INR 0",
