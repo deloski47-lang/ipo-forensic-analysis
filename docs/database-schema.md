@@ -14,7 +14,7 @@ scope: Indian Mainboard IPOs only; local-first; single-user; ₹0 budget
 
 This document defines the proposed concrete SQLite persistence schema for the MVP. It complements, rather than replaces, the Indicator Catalogue & Data Dictionary, Technical Design and [Implementation Blueprint & Data Contract](implementation-blueprint.md).
 
-**Status: proposed v0.1 persistence baseline.** The API/Data Contract has now been frozen in [Implementation Blueprint & Data Contract](implementation-blueprint.md). This existing schema document predates that contract and has known alignment work below; do not implement migration 0001 until the two agree and representative IPO fixtures/tests are ready. This document is a schema proposal, not an implemented or runtime-tested database.
+**Status: proposed schema v0.2.** The P0 API/Data Contract is frozen in [Implementation Blueprint & Data Contract](implementation-blueprint.md), and this document now records its corresponding persistence target. Migration generation, ORM models, representative fixtures and runtime tests are still required. This is a specification, not an implemented or runtime-tested database.
 
 The schema supports the required workflow:
 
