@@ -266,9 +266,12 @@ These tests are the next concrete work items. All tests should be logged against
 | DSA-T12 | Source identity collision | Use issues with similar names or changed symbols; confirm ambiguity is surfaced and facts cannot attach to the wrong issue silently | P0 |
 | DSA-T13 | Source terms / automation gate | Before writing a live adapter, document allowed method, rate limits, storage/retention, personal/non-commercial use, reuse/export, attribution and costs from current source terms or written response | P1 before each adapter |
 
+| DSA-T14 | IPO-name-triggered acquisition orchestrator | For named representative Mainboard IPOs, verify that identity resolution precedes attaching observations, approved connector attempts are recorded, returned fields and separate timestamps persist, and failed/blocked/unavailable outcomes remain visible. Test ambiguous identity and offline operation. | P0 |
+| DSA-T15 | Cross-signal synchronization smoke test | With validated company/offer/valuation inputs and time-stamped QIB/NII/retail and GMP observations, verify the specified first relationships run only on compatible inputs/cutoffs, preserve competing sources and counter-evidence, and mark missing/stale/asynchronous prerequisites instead of inventing a result or claiming causation. | P0 |
+
 ### Minimum sample design
 
-Use at least 10 IPO cases for the first feasibility sample after deciding scope: a mix of recent and older issues, different issue sizes/sectors, more than one registrar/exchange path, and both clean and difficult documents. If SME is within MVP, include SME issues explicitly rather than assuming Mainboard coverage generalizes. The sample is for source availability and extraction reliability, not for claiming predictive performance.
+Use at least 10 **Indian Mainboard IPO** cases for the first feasibility sample: a mix of recent and older issues, different issue sizes/sectors, relevant exchange/registrar paths, and both clean and difficult documents. SME IPOs are out of scope and must not be included in the MVP benchmark. The sample is for source availability and extraction reliability, not for claiming predictive performance.
 
 ## 12. Provider-selection scorecard (use before approving any adapter)
 
@@ -293,10 +296,10 @@ Rate each candidate only after evidence is collected. Use “unknown” rather t
 
 | Decision | Current state | Recommendation |
 |---|---|---|
-| Mainboard vs SME coverage | Open in the approved PRD | Default to Mainboard-first unless SME coverage is a deliberate MVP need; test scope before implementation |
+| Mainboard vs SME coverage | Fixed product decision: Indian Mainboard IPOs only | Keep SME IPOs out of the MVP source benchmark, case identity, adapters and acceptance fixtures |
 | Historical outcome definition | Open; scenarios are MVP, backtest is later | For MVP, use explicit user-entered scenario prices. Before backtesting, define open/first-trade/close and transaction assumptions separately |
-| Which sources must be automated in MVP | Not required by PRD | None. Manual-first must be complete |
-| Subscription/GMP/news/Trends source providers | Not selected | Manual observation with provenance; provider review only after the core passes acceptance |
+| Acquisition workflow vs provider selection | Acquisition orchestration and initial signal interconnection are required P0 product capabilities; individual providers remain unapproved until tested | Implement the provider-neutral orchestrator; benchmark and approve free/permitted routes for critical subscription (QIB/NII/retail) and unofficial GMP signals. If a critical category has no compliant route, obtain an explicit product-owner release decision rather than silently defaulting to manual-only |
+| Subscription/GMP/news/Trends source providers | Not selected; source feasibility is not yet demonstrated | Test candidates early for permitted access, cost, category/field coverage, timestamps, freshness, historical depth and failure behaviour; manual observation remains fallback. Google Trends remains P2 |
 | Paid market-data access | No budget/provider approved | Assume zero external data spend in MVP; do not access/redistribute licensed datasets without terms approval |
 | AI extraction | Optional and not required | Defer until manual workflow and validation are sound; extracted candidates must be user-reviewable |
 | Data persistence and backup | Technical decision remains open | Preserve original files and run history; select local storage only after architecture review |
@@ -321,7 +324,7 @@ This gate validates an evidence-driven manual-first tool. It does **not** valida
 
 ## 15. Research limitations
 
-This is an initial desk-based audit of official web pages and selected secondary methodology pages as reviewed on 29 October 2026. It did not conduct contractual/legal review, request data-provider quotes, test live API endpoints programmatically, measure large-scale extraction accuracy, exhaustively download historical exchange files, or verify every IPO across Mainboard/SME segments. Web pages and tariffs can change. Accordingly, any untested point is marked unknown or conditional, not presented as a fact.
+This is an initial desk-based audit of official web pages and selected secondary methodology pages as reviewed on 29 October 2026. It did not conduct contractual/legal review, request data-provider quotes, test live API endpoints programmatically, measure large-scale extraction accuracy, exhaustively download historical exchange files, or verify every Indian Mainboard IPO. SME IPOs are outside this audit's scope. Web pages and tariffs can change. Accordingly, any untested point is marked unknown or conditional, not presented as a fact.
 
 The findings should be refreshed before a source adapter or commercial/public deployment is approved. Intended use matters: private local research, internal tools and public redistribution may be treated differently by a data provider.
 
