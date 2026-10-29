@@ -27,7 +27,8 @@ Read this file together with:
 2. **Approved PRD:** MVP scope, functional requirements, non-functional requirements and acceptance criteria.
 3. **Data Source & Feasibility Audit:** evidence hierarchy, source feasibility, access/usage constraints, source acceptance tests and manual fallbacks.
 4. **Indicator Catalogue & Data Dictionary:** indicator meanings, logical data-record semantics, formula and normalization standards, cross-indicator dependencies, claim/finding semantics and test expectations.
-5. **AGENTS.md, CLAUDE.md and README.md:** repository rules and binding project constraints.
+5. **Database Schema:** [docs/database-schema.md](database-schema.md) defines the proposed v0.1 SQLite persistence entities, fields, constraints and indexes. Align it with the first Data Contract before implementing migrations.
+6. **AGENTS.md, CLAUDE.md and README.md:** repository rules and binding project constraints.
 
 At present the detailed reference documents are stored in the repository under their versioned filenames within docs/. Preserve their contents and current history. Do not create replacement summaries or duplicate versions as part of this design.
 
@@ -608,7 +609,7 @@ Manual entry, document registration and import remain complete fallbacks. Missin
 
 ## 10. Conceptual data model
 
-These concepts are not yet a field-by-field schema. Exact properties, foreign keys, cardinality details, API representation and final field names will be agreed in the Data Contract/persistence step.
+The proposed persistence fields and relationships are documented in [docs/database-schema.md](database-schema.md). Exact API representation, wire property names, request/response shapes and any schema adjustments required by the Data Contract remain to be agreed before migrations and dependent endpoints are implemented.
 
 | Concept | Purpose | Invariants |
 |---|---|---|
@@ -1514,7 +1515,7 @@ Project-specific evidence-source research stays in the Data Source & Feasibility
 - Vite does not type-check TypeScript by itself; a separate TypeScript check is required.
 - SQLite foreign-key declarations are not enforced unless the connection is configured accordingly; this is now an explicit setup and test requirement.
 - Local upload validation must check actual file content and size, not trust filename/Content-Type alone.
-- No exact endpoint payloads, formula register, supported PDF matrix, database schema or adapter has been claimed as implemented or tested.
+- A proposed SQLite database schema is documented in docs/database-schema.md, but no migration or database runtime behaviour has been claimed as implemented or tested. Exact endpoint payloads, formula register, supported PDF matrix and provider-specific adapters remain unimplemented or unverified.
 
 **Cross-document scope check:** completed. The existing PRD, Data Source & Feasibility Audit, Project Brief and Indicator Catalogue now state Mainboard-only coverage and the ₹0 constraint. Agent instructions and README links were also corrected in place.
 
