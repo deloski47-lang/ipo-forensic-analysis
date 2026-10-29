@@ -149,7 +149,7 @@ async def upload_pdf(
                 raise HTTPException(status_code=415, detail="The file does not have a valid PDF header.")
         now = datetime.now(timezone.utc)
         item = EvidenceModel(
-            id=evidence_id, case_id=case.id, evidence_kind="uploaded_document",
+            id=evidence_id, case_id=case.id, evidence_kind="document",
             title=(title or filename).strip()[:200] or filename,
             source_url=source_url or None, original_file_name=filename, mime_type="application/pdf",
             size_bytes=size, sha256=digest.hexdigest(), published_at=published_at.isoformat().replace("+00:00", "Z") if published_at else None, captured_at=now.isoformat().replace("+00:00", "Z"),
@@ -203,11 +203,7 @@ def review_evidence(
 ) -> EvidenceItem:
     item = get_evidence(db, case_id, evidence_id)
     if payload.action == "verify":
-        item.verification_status = "user_verified"
-    elif payload.action == "mark_conflicted":
-        if not payload.rationale or not payload.rationale.strip():
-            raise HTTPException(status_code=422, detail="A rationale is required when marking evidence conflicted.")
-        item.verification_status = "conflicting"
+        item.verification_status = "reviewed"
     else:
         item.verification_status = "rejected"
     if payload.rationale and payload.rationale.strip():
