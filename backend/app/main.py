@@ -18,6 +18,11 @@ settings = get_settings()
 logging.basicConfig(level=getattr(logging, settings.log_level, logging.INFO))
 
 
+def to_camel(value: str) -> str:
+    head, *tail = value.split("_")
+    return head + "".join(part[:1].upper() + part[1:] for part in tail)
+
+
 def run_migrations() -> None:
     """Apply checked-in Alembic migrations to the user's local database."""
     backend_dir = Path(__file__).resolve().parents[1]
@@ -75,7 +80,7 @@ async def validation_error_handler(request: Request, exc: RequestValidationError
     for error in exc.errors():
         location = [str(part) for part in error.get("loc", []) if part not in ("body", "query", "path")]
         details.append({
-            "field": ".".join(location) or None,
+            "field": ".".join(to_camel(part) for part in location) or None,
             "issueCode": "required" if error.get("type") == "missing" else "invalid",
             "message": "This field is required." if error.get("type") == "missing" else "Check this field's value."
         })
