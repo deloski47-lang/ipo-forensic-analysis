@@ -6,7 +6,7 @@ A local-first, evidence-driven research tool for analysing **Indian Mainboard IP
 
 - **₹0 total budget:** no paid APIs, data, AI, hosting, software, upgrades or paid fallback services.
 - **Mainboard IPOs only:** SME IPOs are out of scope.
-- **Manual-first and local-first:** the core workflow works from user-supplied documents and manual observations; integrations are optional.
+- **Local-first with a complete manual fallback:** offline research, calculations and reporting work from saved/user-supplied evidence. For an identified IPO, the app must also attempt acquisition through approved source connectors and show per-source outcomes; no provider is assumed until free/permitted access and coverage are verified.
 - **Evidence over fluency:** AI never invents values, sources, pages, timestamps or citations.
 - **Deterministic finance:** material calculations are reproducible, documented and tested.
 - **No unvalidated prediction claims:** scenarios are conditional calculations unless a model is validated on appropriate out-of-sample data.
@@ -28,4 +28,4 @@ The repository Markdown files are the source of truth. Update the existing file 
 
 ## Current status
 
-The detailed product requirements, evidence-source baseline, application flow, UI/UX design baseline and proposed technical architecture are recorded. The app-flow, design and Technical Design are specifications, not evidence that the application has been implemented or tested. Before substantive feature development, validate the local technical scaffold, finalize the first Data Contract for the initial vertical slice, approve the initial MVP formula register, and define representative test fixtures. Implementation must remain usable without paid services, live data APIs or AI.
+The detailed product requirements, evidence-source baseline, application flow, UI/UX design baseline and proposed technical architecture are recorded. The app-flow, design and Technical Design are specifications, not evidence that the application has been implemented or tested. Before substantive feature development, validate the local technical scaffold, finalize the first Data Contract for the initial vertical slice, approve the initial MVP formula register, and define representative test fixtures. Implementation must remain usable without paid services, a single external provider or AI. Source-acquisition orchestration and core interconnection of available company/offer fundamentals, valuation, QIB/NII/retail subscription and GMP signals are required product capabilities; individual connectors must be supported by dated feasibility evidence.
