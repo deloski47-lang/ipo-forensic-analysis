@@ -12,9 +12,9 @@ The detailed requirements and research references live in [docs/](docs/):
 - [UI/UX Design Specification](docs/design.md)
 - [Technical Design](docs/TECHNICAL_DESIGN.md)
 
-The linked existing Markdown files are the canonical sources for their content. Update them in place and preserve their full substance; do not create versioned duplicates for routine changes. The binding constraints are ₹0 total budget, Mainboard IPOs only, local-first/manual-first operation, no AI-invented values, and deterministic tested financial calculations.
+The linked existing Markdown files are the canonical sources for their content. Update them in place and preserve their full substance; do not create versioned duplicates for routine changes. The binding constraints are ₹0 total budget, Mainboard IPOs only, local-first operation with a complete manual/offline fallback, IPO-name-triggered source acquisition through verified/approved connectors, interconnected QIB/NII/retail/GMP/company/offer signals, no AI-invented values, and deterministic tested financial calculations.
 
-The Technical Design is a proposed technical baseline. The Application Flow specifies user-visible journeys and states. Respect each document's decision status: resolve required decisions and validate recommendations before implementing dependent features. Never claim tests or integrations work without actually testing them.
+The Technical Design is a proposed technical baseline. The Application Flow specifies user-visible journeys and states. Respect each document's decision status: resolve required decisions and validate recommendations before implementing dependent features. Never claim tests or integrations work without actually testing them. Do not silently narrow source acquisition or core signal interconnection to manual-only because a provider remains unverified; implement the orchestrator, test source feasibility, show source status/coverage, and escalate critical free/permitted-source gaps before release.
 
 ## Required UI/UX workflow
 
