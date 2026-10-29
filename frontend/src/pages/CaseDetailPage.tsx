@@ -25,7 +25,7 @@ export default function CaseDetailPage() {
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const [caseResult, evidenceResult] = await Promise.all([
+      const [caseResult, evidenceResult, readinessResult] = await Promise.all([
         apiGet<CaseDetail>(`/cases/${caseId}`),
         listEvidence(caseId),
         getAnalysisReadiness(caseId)
