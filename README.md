@@ -22,7 +22,7 @@ Read the canonical documents in this order:
 5. [Application Flow](docs/app-flow.md)
 6. [UI/UX Design Specification](docs/design.md)
 7. [Technical Design](docs/TECHNICAL_DESIGN.md)
-8. [Database Schema — proposed v0.1](docs/database-schema.md)
+8. [Database Schema — proposed v0.2](docs/database-schema.md)
 9. [Implementation Blueprint & Data Contract](docs/implementation-blueprint.md)
 10. [Implementation Plan](docs/implementation-plan.md)
 11. [Agent rules](AGENTS.md)
