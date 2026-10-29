@@ -41,3 +41,27 @@ class ResearchCase(Base):
     case_changed_since_last_run: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     readiness_summary: Mapped[str | None] = mapped_column(String(16), nullable=True)
     warning_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+
+class EvidenceItem(Base):
+    __tablename__ = "evidence_items"
+    __table_args__ = (
+        CheckConstraint("evidence_kind IN ('web_page', 'manual_note', 'manual_value', 'uploaded_document')", name="ck_evidence_items_kind"),
+        CheckConstraint("verification_status IN ('unverified', 'user_verified', 'conflicting', 'rejected')", name="ck_evidence_items_verification"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    case_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    evidence_kind: Mapped[str] = mapped_column(String(32), nullable=False)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    source_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    original_file_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    mime_type: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    size_bytes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    published_at: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    captured_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now, index=True)
+    locator: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    verification_status: Mapped[str] = mapped_column(String(24), nullable=False, default="unverified")
+    notes: Mapped[str | None] = mapped_column(String, nullable=True)
+    local_relative_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
