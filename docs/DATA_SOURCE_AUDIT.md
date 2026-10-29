@@ -1,7 +1,9 @@
 # Data Source & Feasibility Audit
 
 **Status:** Canonical v1.0.1  
-**Scope:** Indian Mainboard IPOs only  
+**Scope:** Indian Mainboard IPOs only
+
+> **Binding constraints:** Total budget is **₹0**: no paid APIs, data, AI, hosting, software or upgrades; never assume a service or free tier is free. Scope is Indian Mainboard IPOs only, never SME. Core operation is local-first and manual-first. AI must never invent values, sources or citations. Material financial calculations must be deterministic and tested.  
 **Decision:** The core workflow must operate without any automated external data source.
 
 ## Audit rule
