@@ -6,10 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "ipo-forensic-analysis-backend"
 version = "0.1.0"
 description = "Local-first API for the IPO Forensic Analysis Engine"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 dependencies = [
   "fastapi>=0.115,<1.0",
-  "uvicorn[standard]>=0.34,<1.0",
+  "uvicorn>=0.34,<1.0",
   "pydantic>=2.10,<3.0",
   "SQLAlchemy>=2.0,<3.0",
   "alembic>=1.14,<2.0",
