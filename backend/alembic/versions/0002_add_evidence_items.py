@@ -33,8 +33,8 @@ def upgrade() -> None:
         sa.Column("notes", sa.Text(), nullable=True),
         sa.Column("local_relative_path", sa.String(500), nullable=True),
         sa.ForeignKeyConstraint(["case_id"], ["research_cases.id"], ondelete="CASCADE"),
-        sa.CheckConstraint("evidence_kind IN ('web_page', 'manual_note', 'manual_value', 'uploaded_document')", name="ck_evidence_items_kind"),
-        sa.CheckConstraint("verification_status IN ('unverified', 'user_verified', 'conflicting', 'rejected')", name="ck_evidence_items_verification"),
+        sa.CheckConstraint("evidence_kind IN ('web_page', 'manual_note', 'manual_value', 'document')", name="ck_evidence_items_kind"),
+        sa.CheckConstraint("verification_status IN ('unverified', 'reviewed', 'conflicting', 'rejected')", name="ck_evidence_items_verification"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index("ix_evidence_items_case_id", "evidence_items", ["case_id"])
