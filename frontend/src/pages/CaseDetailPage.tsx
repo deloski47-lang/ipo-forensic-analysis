@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { apiGet, apiPost } from "../api/client";
-import { listEvidence, createEvidence, uploadEvidencePdf, type EvidenceItem } from "../api/evidence";
+import { listEvidence, createEvidence, uploadEvidencePdf, reviewEvidence, type EvidenceItem } from "../api/evidence";
+import { getAnalysisReadiness, type AnalysisReadiness } from "../api/readiness";
 import type { CaseDetail } from "../api/cases";
 
 export default function CaseDetailPage() {
@@ -19,16 +20,19 @@ export default function CaseDetailPage() {
   const [issuerLegalName, setIssuerLegalName] = useState("");
   const [issueDisplayName, setIssueDisplayName] = useState("");
   const [identityEvidenceIds, setIdentityEvidenceIds] = useState<string[]>([]);
+  const [readiness, setReadiness] = useState<AnalysisReadiness | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
       const [caseResult, evidenceResult] = await Promise.all([
         apiGet<CaseDetail>(`/cases/${caseId}`),
-        listEvidence(caseId)
+        listEvidence(caseId),
+        getAnalysisReadiness(caseId)
       ]);
       setResearchCase(caseResult);
       setEvidence(evidenceResult.items);
+      setReadiness(readinessResult);
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load this research case.");
@@ -38,6 +42,21 @@ export default function CaseDetailPage() {
   }, [caseId]);
 
   useEffect(() => { void refresh(); }, [refresh]);
+
+  async function refreshReadiness() {
+    try { setReadiness(await getAnalysisReadiness(caseId)); }
+    catch (e) { setError(e instanceof Error ? e.message : "Could not check analysis readiness."); }
+  }
+
+  async function markEvidenceReviewed(item: EvidenceItem) {
+    setBusy(true); setError(null);
+    try {
+      const updated = await reviewEvidence(caseId, item.evidenceId, "verify", "Reviewed by user in the local research workspace.");
+      setEvidence(previous => previous.map(current => current.evidenceId === updated.evidenceId ? updated : current));
+      await refreshReadiness();
+    } catch (e) { setError(e instanceof Error ? e.message : "Evidence review could not be saved."); }
+    finally { setBusy(false); }
+  }
 
   async function confirmIdentity(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -132,7 +151,7 @@ export default function CaseDetailPage() {
         </form>
       </div>
     </section>
-    <section className="panel evidence-list-panel">
+    <section className="panel readiness-panel"><div className="panel-heading"><div><p className="eyebrow">ANALYSIS PREFLIGHT</p><h2>Readiness check</h2></div><button className="button button-secondary" type="button" onClick={() => void refreshReadiness()}>Recheck</button></div>{readiness && <><p><span className={"case-status " + (readiness.status === "blocked" ? "status-identity_pending" : "status-active")}>{readiness.status}</span></p><p className="muted">Information cutoff: {new Date(readiness.informationCutoffAt).toLocaleString()}</p>{readiness.blockers.map(item => <div className="readiness-issue readiness-blocker" key={item.code}><strong>{item.message}</strong>{item.nextAction && <p className="muted">{item.nextAction}</p>}</div>)}{readiness.warnings.map(item => <div className="readiness-issue readiness-warning" key={item.code}><strong>{item.message}</strong>{item.nextAction && <p className="muted">{item.nextAction}</p>}</div>)}<p className="muted">No financial analysis has run. The approved formula register and external source connectors are not enabled; this check does not invent results.</p></>}</section><section className="panel evidence-list-panel">
       <div className="panel-heading"><div><p className="eyebrow">CASE EVIDENCE</p><h2>Evidence register <span className="count-pill">{evidence.length}</span></h2></div><button className="button button-secondary" type="button" onClick={() => void refresh()} disabled={loading}>Refresh</button></div>
       {evidence.length === 0 ? <div className="empty-cases"><h3>No evidence registered</h3><p className="muted">Add a source reference, a manual note, or a PDF. Nothing is treated as verified automatically.</p></div> :
         <div className="evidence-list">{evidence.map(item => <article className="evidence-row" key={item.evidenceId}>
@@ -142,7 +161,7 @@ export default function CaseDetailPage() {
             {item.sha256 && <p className="evidence-hash">SHA-256: {item.sha256}</p>}
             {item.notes && <p className="muted">{item.notes}</p>}
           </div>
-          <div className="case-row-status"><span className="case-status">{item.verificationStatus.replaceAll("_", " ")}</span>{item.downloadUrl && <a className="button button-secondary" href={"http://127.0.0.1:8000" + item.downloadUrl}>Download PDF</a>}</div>
+          <div className="case-row-status"><span className="case-status">{item.verificationStatus.replaceAll("_", " ")}</span>{item.verificationStatus === "unverified" && <button className="button button-secondary" type="button" onClick={() => void markEvidenceReviewed(item)} disabled={busy}>Mark reviewed</button>}{item.downloadUrl && <a className="button button-secondary" href={"http://127.0.0.1:8000" + item.downloadUrl}>Download PDF</a>}</div>
         </article>)}</div>}
     </section>
   </main>;
