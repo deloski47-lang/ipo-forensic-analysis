@@ -198,3 +198,7 @@ h2 { font-size: 23px; line-height: 1.2; letter-spacing: -.035em; margin-bottom: 
 .saved-scenarios { margin-top: 24px; }
 .saved-scenarios > h3 { font-size: 14px; }
 @media (max-width: 620px) { .scenario-price-grid, .scenario-result-grid { grid-template-columns: 1fr; } }
+
+.facts-panel { margin-top: 22px; }
+.fact-form { max-width: 760px; }
+.fact-form select, .fact-form input, .fact-form textarea { font-size: 13px; }
