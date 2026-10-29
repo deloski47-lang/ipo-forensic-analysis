@@ -8,7 +8,7 @@ from app.schemas.health import ApiSchema
 
 class ReadinessIssue(ApiSchema):
     code: str
-    severity: Literal["blocker", "warning", "info"]
+    severity: Literal["blocking", "warning", "info"]
     message: str
     affected_indicator_codes: list[str] = Field(default_factory=list)
     affected_signal_categories: list[str] = Field(default_factory=list)
