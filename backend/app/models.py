@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import Boolean, CheckConstraint, Integer, String
+from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -32,7 +32,7 @@ class ResearchCase(Base):
     title: Mapped[str] = mapped_column(String(160), nullable=False)
     case_status: Mapped[str] = mapped_column(String(32), nullable=False, default="identity_pending", index=True)
     identity_status: Mapped[str] = mapped_column(String(32), nullable=False, default="unresolved")
-    issue_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    issue_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("ipo_issues.id"), nullable=True)
     created_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now)
     updated_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now, onupdate=utc_now)
     last_activity_at: Mapped[str] = mapped_column(String(40), nullable=False, default=utc_now, index=True)
@@ -51,7 +51,7 @@ class EvidenceItem(Base):
     )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
-    case_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    case_id: Mapped[str] = mapped_column(String(36), ForeignKey("research_cases.id"), nullable=False, index=True)
     evidence_kind: Mapped[str] = mapped_column(String(32), nullable=False)
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     source_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
@@ -83,7 +83,7 @@ class IpoIssue(Base):
     )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
-    issuer_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    issuer_id: Mapped[str] = mapped_column(String(36), ForeignKey("issuers.id"), nullable=False, index=True)
     display_name: Mapped[str] = mapped_column(String(200), nullable=False)
     market_segment: Mapped[str] = mapped_column(String(16), nullable=False, default="MAINBOARD")
     open_date: Mapped[str | None] = mapped_column(String(10), nullable=True)
