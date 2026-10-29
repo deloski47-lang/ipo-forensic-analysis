@@ -164,7 +164,7 @@ Individual source providers and AI are optional adapter boundaries, but **the so
 
 ### 4.5 Deliver one working vertical slice first
 
-First demonstrate this path end to end: create one Mainboard IPO case, register an official offer PDF, enter a small approved set of fields manually, validate them, calculate an approved formula set, produce a traceable report, save a run and reopen it. Do not build many empty screens or implement all indicators before this path works.
+First demonstrate this path end to end: create one Mainboard IPO case, attempt approved issue/source discovery and connector acquisition after identity resolution, show per-source outcomes/coverage, register an official offer PDF, supplement unavailable signals manually, validate them, calculate an approved formula set, run the first interconnected checks across available fundamentals/valuation and QIB/NII/retail/GMP signals, produce a traceable report, save a run and reopen it. Include a tested path where one or more source connectors fail or have no compliant free route, and show honest status plus the manual fallback. Do not build many empty screens or implement all indicators before this path works.
 
 ---
 
@@ -1181,7 +1181,8 @@ Cover:
 - Stale/conflicting input handling.
 - Decimal precision and display rounding.
 - Listing return arithmetic.
-- Cross-check trigger and non-trigger logic.
+- Cross-check trigger and non-trigger logic, including subscription/GMP against valuation/fundamentals/market context where prerequisites exist.
+- Source-acquisition status mapping and stale/partial/missing/conflicting observation handling.
 - Identity ambiguity.
 - Information-cutoff inclusion/exclusion.
 - File hash and evidence status transitions.
@@ -1200,7 +1201,10 @@ Cover:
 - Save/retrieve analysis run and input snapshot.
 - Report generated from a saved run.
 - Database/filesystem failure handling.
-- Operation without internet or optional credentials.
+- Source-acquisition orchestrator: connector attempted/succeeded/partial/unavailable/blocked outcomes, timestamp persistence, retries and safe errors.
+- Source connector failure, missing credential, rate limit and source-change tests; ensure no silent paid fallback.
+- QIB/NII/retail/GMP observation mapping and core cross-signal integration tests.
+- Operation without internet or optional credentials, with truthful acquisition status and a complete manual fallback.
 
 Use temporary directories and temporary test databases. Tests must not touch real user research data. Include a test that SQLite foreign-key enforcement is enabled, and test schema migration from a previous revision as well as initial database creation.
 
