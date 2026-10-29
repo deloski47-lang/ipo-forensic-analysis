@@ -1,5 +1,5 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router";
 import { AppRouter } from "../src/app/router";
@@ -55,10 +55,9 @@ describe("research cases workspace", () => {
   });
 
   it("creates a case through the API and shows it only after the API responds", async () => {
-    const user = userEvent.setup();
     render(<MemoryRouter initialEntries={["/cases"]}><AppRouter /></MemoryRouter>);
-    await user.type(screen.getByLabelText(/ipo or issuer name/i), "New Mainboard IPO");
-    await user.click(screen.getByRole("button", { name: /create research case/i }));
+    fireEvent.change(screen.getByLabelText(/ipo or issuer name/i), { target: { value: "New Mainboard IPO" } });
+    fireEvent.click(screen.getByRole("button", { name: /create research case/i }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
       expect.stringMatching(/\/cases$/),
       expect.objectContaining({ method: "POST", body: JSON.stringify({ enteredName: "New Mainboard IPO" }) })
