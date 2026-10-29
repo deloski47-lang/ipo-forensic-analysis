@@ -1437,6 +1437,11 @@ If the repository is not cloned locally or local setup is temporarily impractica
 
 For any UI/UX implementation, follow docs/design.md and the repository's required Frontend Design skill/plugin gate. The hero remains unimplemented until the owner provides the exact approved component source.
 
+Official references to recheck when installing:
+- Claude Code setup/install: https://code.claude.com/docs/en/getting-started
+- Claude Code CLI use and permission/plan options: https://code.claude.com/docs/en/cli-usage
+- Claude Code use with Claude Pro/Max subscriptions and rate-limit guidance: https://support.claude.com/en/articles/11145838-use-claude-code-with-your-pro-or-max-plan
+
 ---
 
 ## 19. Change control and definition of done
