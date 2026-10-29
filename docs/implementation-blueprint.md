@@ -2,7 +2,7 @@
 title: IPO Forensic Analysis Engine — Implementation Blueprint and Data Contract
 document_id: IB-IPO-001
 version: 1.0
-status: Frozen P0 implementation baseline; implementation and runtime tests not yet completed
+status: Frozen P0 contract; case-persistence slice implemented on review branch; full application and runtime verification remain incomplete
 last_updated: 29 October 2026
 canonical_source: Markdown in GitHub
 scope: Indian Mainboard IPOs only; local-first; single-user; manual-first; ₹0 total budget
