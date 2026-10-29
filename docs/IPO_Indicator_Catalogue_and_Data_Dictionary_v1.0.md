@@ -558,16 +558,12 @@ News API is recommended as an ingestion option, not a source of truth and not ne
 
 # 13. MVP Prioritization
 
-
-
 | Priority | Scope | Reason / exit criterion |
 | --- | --- | --- |
-| P0 — required first | Evidence registry, upload/manual input, document/page citations, core financial calculations, missing-data states, report generation, first cross-checks | Can produce a useful, auditable report for one IPO without live APIs. |
-| P1 — core listing signals | Issue mechanics, valuation, category subscription snapshots, GMP timestamp history, market regime, scenario output | Adds listing-day-specific context while preserving source timestamps. |
-| P2 — news integration | News provider adapter, deduplication, event classification, primary-source verification workflow, news-to-indicator graph | Improves event discovery; provider chosen after coverage/cost test. |
-| P3 — advanced forensic modules | Sector-specific checks, richer table extraction, related-party/dependency graph, more contradiction rules | Broadens coverage after data and core workflow are reliable. |
-| P4 — validation and automation | Historical backtest, feature ablation, calibration, source adapters and monitoring | Only after sufficient timestamped data and repeatable outputs exist. |
-
+| P0 — required first | Source/evidence registry; issue/source discovery and acquisition orchestration; source-attempt/status logging; free/permitted connectors that pass the critical-signal feasibility gate; manual/upload fallback; core financial/offer/valuation calculations; category-wise subscription and GMP observations with provenance/freshness; first cross-indicator findings; listing scenarios and traceable report/run history | A user can enter a Mainboard IPO name, resolve identity, see supported acquisition attempts and missing categories, supplement data manually, and generate an auditable report connecting available fundamentals, valuation, QIB/NII/retail demand, GMP and market/company-event evidence. Unsupported provider access is shown honestly; critical source gaps are explicitly resolved before release. |
+| P1 — expanded signal coverage | Additional approved connectors; broader official event/news retrieval; richer timestamped subscription/GMP history; market-regime and peer IPO context; deduplication and more cross-signal rules | Improves coverage and timeliness after the source benchmark proves the underlying access and data quality. Does not make any single provider mandatory if it has not passed feasibility/rights review. |
+| P2 — conditional signals | Google Trends/search attention and other optional attention indicators; advanced sector-specific checks and expanded dependency graph | Only add where access is permitted, definitions are adequate, and the signal contributes a testable analytical relationship. No placeholder should imply a signal is operational. |
+| P3 — validation and predictive evaluation | Historical listing outcome dataset, leakage-controlled backtests, feature ablation and calibration | Only after point-in-time data quality and outcome definitions are approved; never infer predictive value from narrative plausibility alone. |
 
 # 14. Acceptance Tests for the Catalogue
 
@@ -591,6 +587,10 @@ News API is recommended as an ingestion option, not a source of truth and not ne
 - [ ] If a historical input is timestamped after the decision cutoff, the backtest pipeline rejects it.
 
 - [ ] If the report gives a scenario, it identifies assumptions and does not call the scenario a guaranteed or calibrated probability.
+- [ ] Entering a Mainboard IPO name initiates issue/source discovery and acquisition attempts for approved connectors; the case shows attempted/succeeded/partial/unavailable/blocked results rather than equating a failed retrieval with a missing-but-checked or zero value.
+- [ ] QIB/NII/retail subscription and named unofficial GMP observations retain source, units/definition, status and separate time fields; two different sources/times are not silently collapsed.
+- [ ] Core P0 cross-checks evaluate subscription against valuation/fundamentals and compare GMP against subscription/valuation/market context when inputs are valid; missing or stale inputs produce an explicit skipped/qualified result.
+- [ ] A dated source benchmark records field coverage, source terms/access method, timestamp behaviour and failures before any connector is called reliable.
 
 
 # 15. Source and API Research Starting Points
