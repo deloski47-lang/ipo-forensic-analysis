@@ -86,7 +86,7 @@ def create_evidence(case_id: str, payload: CreateEvidenceRequest, db: Session = 
         mime_type=None,
         size_bytes=None,
         sha256=None,
-        published_at=payload.published_at,
+        published_at=payload.published_at.isoformat().replace("+00:00", "Z") if payload.published_at else None,
         captured_at=now,
         locator=None,
         verification_status="unverified",
@@ -151,7 +151,7 @@ async def upload_pdf(
             id=evidence_id, case_id=case.id, evidence_kind="uploaded_document",
             title=(title or filename).strip()[:200] or filename,
             source_url=source_url or None, original_file_name=filename, mime_type="application/pdf",
-            size_bytes=size, sha256=digest.hexdigest(), published_at=published_at, captured_at=now,
+            size_bytes=size, sha256=digest.hexdigest(), published_at=published_at.isoformat().replace("+00:00", "Z") if published_at else None, captured_at=now.isoformat().replace("+00:00", "Z"),
             locator=None, verification_status="unverified", notes=notes,
             local_relative_path=relative.as_posix(),
         )
