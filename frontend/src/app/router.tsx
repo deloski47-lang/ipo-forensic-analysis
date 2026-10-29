@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router";
 import CasesPage from "../pages/CasesPage";
+import CaseDetailPage from "../pages/CaseDetailPage";
 
 function NotFoundPage() {
   return (
@@ -19,6 +20,7 @@ export function AppRouter() {
     <Routes>
       <Route path="/" element={<Navigate to="/cases" replace />} />
       <Route path="/cases" element={<CasesPage />} />
+      <Route path="/cases/:caseId" element={<CaseDetailPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
